@@ -1,0 +1,15 @@
+﻿<Properties StartupItem="dub.json">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Default" PreferredExecutionTarget="cov" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="src/gccbuild/download.d">
+    <Files>
+      <File FileName="src/main.d" Line="3" Column="54" />
+      <File FileName="src/gccbuild/download.d" Line="55" Column="35" />
+      <File FileName="src/gccbuild/config.d" Line="56" Column="66" />
+      <File FileName="src/gccbuild/console.d" Line="37" Column="17" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

@@ -1,0 +1,14 @@
+{
+	"name": "gcc-build-script",
+	"authors": [
+		"Johannes Pfau"
+	],
+	"dependencies": {
+		"scriptlike": "~>0.9.6",
+		"consoled": "~>1.0.4",
+		"painlessjson": "~>1.3.7"
+	},
+	"description": "A script to build GCC compilers",
+	"copyright": "Copyright © 2016, Johannes Pfau",
+	"license": "BSL-1.0"
+}
