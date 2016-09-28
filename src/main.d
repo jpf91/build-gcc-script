@@ -5,6 +5,7 @@ void main(string[] args)
     if(!handleArguments(args))
         return;
 
+    intializeLog(Path("log.txt"));
     loadBuildConfig(buildConfig);
     loadMirrors();
 

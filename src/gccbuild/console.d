@@ -1,6 +1,6 @@
 ﻿module gccbuild.console;
 
-import consoled, scriptlike;
+import consoled, scriptlike, gccbuild;
 
 void startSection(string text)
 {
@@ -14,20 +14,26 @@ void startSection(string text)
     writec(FontStyle.bold, Fg.green, "==> ", Fg.initial, text);
     resetFontStyle();
     writecln();
+
+    startSectionLog(text);
 }
 
 private void writeError(string text)
 {
-    writec(FontStyle.bold, Fg.red, "==> ERROR: ", Fg.initial, text);
+    enum prefix = "==> ERROR: ";
+    writec(FontStyle.bold, Fg.red, prefix, Fg.initial, text);
     resetFontStyle();
     writecln();
+    logFile.writeln(prefix, text);
 }
 
 void writeBulletPoint(string text)
 {
-    writec(FontStyle.bold, Fg.blue, "  -> ", Fg.initial, text);
+    enum prefix = "  -> ";
+    writec(FontStyle.bold, Fg.blue, prefix, Fg.initial, text);
     resetFontStyle();
     writecln();
+    logFile.writeln(prefix, text);
 }
 
 void failc(T...)(T args)

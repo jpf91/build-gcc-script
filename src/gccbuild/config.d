@@ -21,6 +21,7 @@ string[][string] mirrors;
 
 void loadMirrors()
 {
+    startSectionLog("Loading mirror information");
     try
         mirrors = fromJSON!(typeof(mirrors))(mirrorFile.readText().parseJSON());
     catch(Exception e)
@@ -29,6 +30,7 @@ void loadMirrors()
 
 void loadBuildConfig(Path file)
 {
+    startSectionLog("Loading build configuration");
     try
         build = fromJSON!BuildConfig(file.readText().parseJSON());
     catch(Exception e)

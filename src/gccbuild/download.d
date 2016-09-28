@@ -16,11 +16,8 @@ void downloadSources()
         if (dlPath.exists && !forceDownload)
         {
             if (verifyCachedSources)
-            {
-                auto md5 = File(dlPath.toString()).byChunk(4096).md5Of().toHexString!(LetterCase.lower);
-                failEnforcec(sicmp(md5, component.md5) == 0,"Invalid MD5 of cached ", component.file,
-                    " file: is: ", md5, " expected: ", component.md5);
-            }
+                enforceChecksum(dlPath, component.md5);
+
             writeBulletPoint("Found " ~ component.file ~ " (cached)");
         }
         else
@@ -40,6 +37,7 @@ void downloadSources()
                 try
                 {
                     auto output = runCollect(mixin(interp!"wget ${url} -O ${dlPath}"));
+                    writeLogCMD(output);
                     break;
                 }
                 catch(Exception e)
@@ -49,17 +47,29 @@ void downloadSources()
             }
 
             failEnforcec(dlPath.exists, "Failed to find a working mirror for ", component.file);
-
-            auto md5 = File(dlPath.toString()).byChunk(4096).md5Of().toHexString!(LetterCase.lower);
-            if(sicmp(md5, component.md5) != 0)
-            {
-                tryRemove(dlPath);
-                failc("Invalid MD5 of downloaded ", component.file, " file: is: ", md5, " expected: ", component.md5);
-            }
+            enforceChecksum(dlPath, component.md5);
         }
     }
 }
 
+void enforceChecksum(Path file, string sum)
+{
+    if(!verifyFile(file, sum))
+        failc("Invalid MD5 of ", file);
+}
+
+bool verifyFile(Path file, string sum)
+{
+    auto md5 = File(file.toString()).byChunk(4096).md5Of().toHexString!(LetterCase.lower);
+    if (sicmp(md5, sum) == 0)
+    {
+        yapFunc("md5(", file, ")=", md5, " == ", sum, " => OK");
+        return true;
+    }
+
+    yapFunc("md5(", file, ")=", md5, " == ", sum, " => FAIL");
+    return false;
+}
 
 auto namedFields(T, A...)(T instance)
 {
