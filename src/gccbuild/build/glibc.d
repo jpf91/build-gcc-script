@@ -14,7 +14,7 @@ void buildGlibc()
         writeBulletPoint("Multilib variant: " ~ (multilib.isDefaultLib ? "default" : multilib.args));
         auto saveCWD = comp.prepareBuildDir();
 
-        auto mlibDir = Path("/lib") ~ multilib.osFolder;
+        auto mlibDir = Path("/") ~ Path(build.relativeSysrootPrefix) ~ Path("lib") ~ Path(multilib.osFolder);
         string[string] extraVars;
         extraVars["DIR_MULTILIB"] = mlibDir.toString();
         extraVars["MULTILIB_ARGS"] = multilib.args;

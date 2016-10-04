@@ -152,6 +152,7 @@ void setupBuildVariables()
     buildVariables["DIR_MPC_INSTALL"] = (hostlibDir ~ build.mpc.baseDirName).toString();
     buildVariables["DIR_TOOLCHAIN"] = toolchainDir.toString();
     buildVariables["DIR_SYSROOT"] = sysrootDir.toString();
+    buildVariables["DIR_SYSROOT_PREFIX"] = build.sysrootPrefix;
     buildVariables["DIR_TOOLCHAIN_STAGE1"] = toolchainDirStage1.toString();
     buildVariables["DIR_SYSROOT_STAGE1"] = sysrootDirStage1.toString();
     buildVariables["TARGET_GCC"] = build.target ~ "-gcc";
@@ -208,6 +209,8 @@ struct BuildConfig
 {
     string host, target, arch;
     string[string] constants;
+
+    @SerializedName("sysroot_prefix") string sysrootPrefix = "/";
 
     @SerializeIgnore ToolchainType type;
 
@@ -267,6 +270,11 @@ struct MainConfig
     @SerializeIgnore string arch;
     @SerializeIgnore string[string] constants;
     @SerializeIgnore MultilibEntry[] multilibs;
+    @SerializeIgnore string sysrootPrefix;
+    @property string relativeSysrootPrefix()
+    {
+        return sysrootPrefix.relativePath("/");
+    }
 
     @SerializeIgnore ToolchainType type;
 
@@ -299,6 +307,7 @@ struct MainConfig
         arch = config.arch;
         constants = config.constants;
         type = config.type;
+        sysrootPrefix = config.sysrootPrefix;
         
         mpc.commands["main"] = config.mpc;
         mpfr.commands["main"] = config.mpfr;
