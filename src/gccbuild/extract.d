@@ -15,14 +15,14 @@ void extractSources()
 
     if(build.glibc.isInConfig && !build.glibcPorts.file.empty)
     {
-        extractComponent(build.glibcPorts);
+        extractComponent(&build.glibcPorts);
         runCollectLog("mv " ~ build.glibcPorts.sourceFolder.toString() ~ " " ~ (build.glibc.sourceFolder ~ "ports").toString());
     }
 
     endSection();
 }
 
-void extractComponent(MainConfig.Component component)
+void extractComponent(MainConfig.Component* component)
 {
     switch(component.file.extension)
     {
@@ -46,6 +46,7 @@ void extractComponent(MainConfig.Component component)
                     runCollectLog(mixin(interp!"tar xf ${component.localFile}"));
                 catch (Exception e)
                     failc("Couldn't extract ", component.file, ": ", e);
+                component.wasExtracted = true;
                 endBulletPoint();
             }
             break;

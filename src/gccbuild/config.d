@@ -17,6 +17,7 @@ bool skipStripLibraries = false;
 bool skipStripBinaries = false;
 bool keepBuildFiles = false;
 string hostStripCMD;
+string[] patchDirsCMD;
 
 @property string hostStrip()
 {
@@ -24,6 +25,24 @@ string hostStripCMD;
         return hostStripCMD;
     else
         return build.host ~ "-strip";
+}
+
+@property Path[] patchDirectories()
+{
+    Path[] result;
+    result ~= mainPatchDir;
+    foreach(dir; build.localPatchDirs)
+    {
+        // Make sure relative Paths are relative to the build config specifying them
+        auto path = Path(dir);
+        if(!path.isAbsolute)
+            path = path.absolutePath(buildConfig.dirName);
+        result ~= path;
+    }
+    foreach(dir; patchDirsCMD)
+        result ~= Path(dir);
+
+    return result;
 }
 
 struct CMDBuildOverwrites
@@ -67,6 +86,11 @@ CMDBuildOverwrites cmdOverwrites;
 @property Path hostlibDir()
 {
     return installDir ~ "host";
+}
+
+@property Path mainPatchDir()
+{
+    return cacheDir ~ "patches";
 }
 
 @property Path installDir()
@@ -162,8 +186,10 @@ void setupBuildVariables()
     buildVariables["DIR_TOOLCHAIN"] = toolchainDir.toString();
     buildVariables["DIR_SYSROOT"] = sysrootDir.toString();
     buildVariables["DIR_SYSROOT_PREFIX"] = build.sysrootPrefix;
+    buildVariables["DIR_SYSROOT_WITH_PREFIX"] = (sysrootDir ~ build.relativeSysrootPrefix).toString();
     buildVariables["DIR_TOOLCHAIN_STAGE1"] = toolchainDirStage1.toString();
     buildVariables["DIR_SYSROOT_STAGE1"] = sysrootDirStage1.toString();
+    buildVariables["DIR_SYSROOT_STAGE1_WITH_PREFIX"] = (sysrootDirStage1 ~ build.relativeSysrootPrefix).toString();
     buildVariables["TARGET_GCC"] = build.target ~ "-gcc";
 
     // overwrite from build.json
@@ -205,7 +231,7 @@ auto namedFields(T, A...)(T instance)
         {
             if (i != 0)
                 result ~= ", ";
-            result ~= "tuple!(\"name\", \"value\")(\"" ~ entry ~ "\", instance." ~ entry ~ ")";
+            result ~= "tuple!(\"name\", \"value\")(\"" ~ entry ~ "\", &instance." ~ entry ~ ")";
         }
         result ~= ");";
         return result;
@@ -220,6 +246,7 @@ struct BuildConfig
     string[string] constants;
 
     @SerializedName("sysroot_prefix") string sysrootPrefix = "/";
+    @SerializedName("patch_dirs") string[] localPatchDirs;
 
     @SerializeIgnore ToolchainType type;
 
@@ -236,6 +263,7 @@ struct MainConfig
         string suburl;
 
         @SerializeIgnore BuildCommand[string] commands;
+        @SerializeIgnore bool wasExtracted = false;
 
         // Whether this component is specified in config file
         @property bool isInConfig()
@@ -286,6 +314,7 @@ struct MainConfig
     }
 
     @SerializeIgnore ToolchainType type;
+    @SerializeIgnore string[] localPatchDirs;
 
     Component mpc, mpfr, gmp, glibc, binutils, linux, w32api, gcc;
     // This is a special component: only a addon for glibc, don't build individually
@@ -317,6 +346,7 @@ struct MainConfig
         constants = config.constants;
         type = config.type;
         sysrootPrefix = config.sysrootPrefix;
+        localPatchDirs = config.localPatchDirs;
         
         mpc.commands["main"] = config.mpc;
         mpfr.commands["main"] = config.mpfr;

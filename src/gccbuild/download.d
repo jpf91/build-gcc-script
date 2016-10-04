@@ -9,7 +9,7 @@ void downloadSources()
 
     foreach(name, component; build.configuredComponents)
     {
-        downloadComponent(name, component);
+        downloadComponent(name, *component);
     }
 
     if(!build.glibcPorts.file.empty)

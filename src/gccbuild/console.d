@@ -48,12 +48,12 @@ void writeBulletPoint(string text)
     writec(FontStyle.bold, Fg.blue, prefix, Fg.initial, text);
     resetFontStyle();
     writecln();
-    writelnLog(prefix, text);
+    writeBulletPointLog(text);
 }
 
 void endBulletPoint()
 {
-    writelnLog("  :  (", Clock.currTime - bulletStartTime, ")");
+    endBulletPointLog(Clock.currTime - bulletStartTime);
 }
 
 void failc(T...)(T args)

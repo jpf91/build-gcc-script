@@ -46,7 +46,7 @@ void stripTargetLibraries()
     auto oldPath = updatePathVar(binDir);
     foreach(multilib; build.multilibs)
     {
-        auto path = toolchainDir ~ Path("lib") ~ Path(multilib.osFolder);
+        auto path = toolchainDir ~ Path(build.relativeSysrootPrefix) ~ Path("lib") ~ Path(multilib.osFolder);
         auto path2 = toolchainDir ~ Path(build.target) ~ Path(build.relativeSysrootPrefix) ~ Path("lib") ~ Path(multilib.osFolder);
         auto path3 = sysrootDir ~ Path(build.relativeSysrootPrefix) ~ Path("lib") ~ Path(multilib.osFolder);
         stripPath(path, build.target ~ "-strip");

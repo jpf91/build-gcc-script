@@ -70,6 +70,25 @@ void endSectionLog(Duration dur)
         logFile.writefln(":   (%s)", dur);
 }
 
+private SysTime bulletStartTime;
+
+void writeBulletPointLog(string text)
+{
+    enum prefix = "  -> ";
+    bulletStartTime = Clock.currTime;
+    writelnLog(prefix, text);
+}
+
+void endBulletPointLog()
+{
+    endBulletPointLog(Clock.currTime - bulletStartTime);
+}
+
+void endBulletPointLog(Duration dur)
+{
+    writelnLog("  :  (", Clock.currTime - bulletStartTime, ")");
+}
+
 void closeLog()
 {
     logFile.close();
