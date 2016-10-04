@@ -18,6 +18,7 @@ bool skipStripBinaries = false;
 bool keepBuildFiles = false;
 string hostStripCMD;
 string[] patchDirsCMD;
+string gdcSourcePath;
 
 @property string hostStrip()
 {

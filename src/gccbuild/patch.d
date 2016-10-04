@@ -4,7 +4,7 @@ import scriptlike, gccbuild;
 
 void patchSources()
 {
-    startSectionLog("Patch directories:");
+    startSectionLog("Dumping patch directories");
     foreach(entry; patchDirectories)
         writeBulletPointLog(entry.toString());
     endSectionLog();
@@ -13,6 +13,14 @@ void patchSources()
     foreach(name, component; build.configuredComponents)
     {
         patchComponent(*component);
+    }
+
+    if(!gdcSourcePath.empty)
+    {
+        writeBulletPoint("Merging GDC into GCC");
+        auto oldCWD = pushCWD(Path(gdcSourcePath));
+        runCollectLog("./setup-gcc.sh " ~ build.gcc.sourceFolder.toString());
+        endBulletPoint();
     }
     endSection();
 }

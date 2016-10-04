@@ -51,6 +51,7 @@ bool handleArguments(string[] args)
         "gcc-md5", "Overwrite gcc file md5", &cmdOverwrites.gccMD5,
         "host-strip", "Command to strip binaries for host", &hostStripCMD,
         "extra-patch-dir", "Add directory continaing patches", &patchDirsCMD,
+        "gdc-src", "Path to GDC sources", &gdcSourcePath,
         );
 
     bool printHelp = false;
