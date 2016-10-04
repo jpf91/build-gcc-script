@@ -48,7 +48,8 @@ bool handleArguments(string[] args)
         "variable", "Set build variable (--variable=key:val)", &setBuildVariable,
         "gcc-file", "Overwrite gcc source filename", &cmdOverwrites.gccFile,
         "gcc-suburl", "Overwrite gcc suburl", &cmdOverwrites.gccSuburl,
-        "gcc-md5", "Overwrite gcc file md5", &cmdOverwrites.gccMD5
+        "gcc-md5", "Overwrite gcc file md5", &cmdOverwrites.gccMD5,
+        "host-strip", "Command to strip binaries for host", &hostStripCMD
         );
 
     bool printHelp = false;

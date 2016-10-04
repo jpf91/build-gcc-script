@@ -16,6 +16,15 @@ string[string] cmdVariables;
 bool skipStripLibraries = false;
 bool skipStripBinaries = false;
 bool keepBuildFiles = false;
+string hostStripCMD;
+
+@property string hostStrip()
+{
+    if(!hostStripCMD.empty)
+        return hostStripCMD;
+    else
+        return build.host ~ "-strip";
+}
 
 struct CMDBuildOverwrites
 {

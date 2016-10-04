@@ -69,8 +69,8 @@ void stripHostBinaries()
     auto path = toolchainDir ~ "bin";
     auto path2 = toolchainDir ~ Path(build.target) ~ "bin";
 
-    stripPath(path, build.host ~ "-strip", true, false);
-    stripPath(path2, build.host ~ "-strip", true, false);
+    stripPath(path, hostStrip, true, false);
+    stripPath(path2, hostStrip, true, false);
     endBulletPoint();
 }
 
