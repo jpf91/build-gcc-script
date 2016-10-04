@@ -61,6 +61,6 @@ string[] getPatchList(MainConfig.Component component)
     auto sorted = patches.values.dup;
     sorted.sort!((a,b) => a.baseName < b.baseName);
 
-    yapFunc("patches: ", sorted);
+    yapFunc(sorted);
     return sorted;
 }

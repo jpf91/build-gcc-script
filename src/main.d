@@ -50,7 +50,7 @@ bool handleArguments(string[] args)
         "gcc-suburl", "Overwrite gcc suburl", &cmdOverwrites.gccSuburl,
         "gcc-md5", "Overwrite gcc file md5", &cmdOverwrites.gccMD5,
         "host-strip", "Command to strip binaries for host", &hostStripCMD,
-        "extra-patch-dir", "Add directory continaing patches", &patchDirsCMD,
+        "extra-patch-dir", "Add directory containing patches", &patchDirsCMD,
         "gdc-src", "Path to GDC sources", &gdcSourcePath,
         );
 
@@ -60,15 +60,15 @@ bool handleArguments(string[] args)
         switch(args.length)
         {
             case 3:
-                buildConfig = Path(args[2]);
-                sourceConfig = Path(args[1]);
+                buildConfig = Path(args[2]).absolutePath;
+                sourceConfig = Path(args[1]).absolutePath;
                 mode = BuildMode.all;
                 failEnforcec(buildConfig.exists, "Invalid path for build settings file: ", buildConfig);
                 failEnforcec(sourceConfig.exists, "Invalid path for sources file: ", sourceConfig);
                 break;
             case 4:
-                buildConfig = Path(args[3]);
-                sourceConfig = Path(args[2]);
+                buildConfig = Path(args[3]).absolutePath;
+                sourceConfig = Path(args[2]).absolutePath;
                 mode = to!BuildMode(args[1]);
                 failEnforcec(buildConfig.exists, "Invalid path for build settings file: ", buildConfig);
                 failEnforcec(sourceConfig.exists, "Invalid path for sources file: ", sourceConfig);

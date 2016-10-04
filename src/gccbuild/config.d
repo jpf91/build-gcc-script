@@ -223,7 +223,7 @@ void dumpConfiguration()
     endSection();
 }
 
-auto namedFields(T, A...)(T instance)
+auto namedFields(T, A...)(ref T instance)
 {
     static string generateMixin(string[] fields)
     {
