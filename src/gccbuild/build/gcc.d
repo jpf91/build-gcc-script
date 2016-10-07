@@ -20,11 +20,16 @@ void buildStage1GCC()
 
 void detectMultilib()
 {
-    startSection("Detecting available multilibs");
     auto oldPath = updatePathVar(binDirStage1);
+    detectMultilib(build.target ~ "-gcc");
+    restorePathVar(oldPath);
+}
 
-    auto gccName = build.target ~ "-gcc";
-    auto output = runCollectLog(gccName ~ " --print-multi-lib");
+void detectMultilib(string compiler)
+{
+    startSection("Detecting available multilibs");
+
+    auto output = runCollectLog(compiler ~ " --print-multi-lib");
     foreach(line; output.lineSplitter)
     {
         MultilibEntry entry;
@@ -33,7 +38,7 @@ void detectMultilib()
         entry.gccFolder = parts[0];
         entry.args = parts[2].splitter("@").filter!(a => !a.empty).map!(a => "-" ~ a).join(" ");
 
-        auto output2 = runCollectLog(gccName ~ " --print-multi-os-dir " ~ entry.args);
+        auto output2 = runCollectLog(compiler ~ " --print-multi-os-dir " ~ entry.args);
         entry.osFolder = output2.strip();
         build.multilibs ~= entry;
     }
@@ -47,8 +52,6 @@ void detectMultilib()
             writeBulletPoint("args='" ~ lib.args ~ "' osDir='" ~ lib.osFolder ~ "' gccDir='" ~ lib.gccFolder ~ "'");
         }
     }
-
-    restorePathVar(oldPath);
     endSection();
 }
 
