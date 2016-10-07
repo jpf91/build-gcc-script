@@ -52,6 +52,7 @@ bool handleArguments(string[] args)
         "host-strip", "Command to strip binaries for host", &hostStripCMD,
         "extra-patch-dir", "Add directory containing patches", &patchDirsCMD,
         "gdc-src", "Path to GDC sources", &gdcSourcePath,
+        "type", "Overwrite toolchain type", (string opt, string val) {cmdOverwrites.type = to!ToolchainType(val);},
         );
 
     bool printHelp = false;

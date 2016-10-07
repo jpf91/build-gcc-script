@@ -4,7 +4,7 @@ import gccbuild, scriptlike, painlessjson, std.json;
 
 BuildMode mode = BuildMode.all;
 Path buildConfig, sourceConfig, logFilePath;
-string buildTriplet = "x86_64-pc-linux-gnu";
+string buildTriplet = "x86_64-unknown-linux-gnu";
 Path mirrorFile = "mirrors.json";
 bool verifyCachedSources = true;
 bool forceDownload = false;
@@ -24,6 +24,8 @@ string gdcSourcePath;
 {
     if(!hostStripCMD.empty)
         return hostStripCMD;
+    else if(build.type == ToolchainType.native)
+        return "strip";
     else
         return build.host ~ "-strip";
 }
@@ -50,6 +52,7 @@ struct CMDBuildOverwrites
 {
     string host, target;
     string gccFile, gccSuburl, gccMD5;
+    Nullable!ToolchainType type;
 }
 
 CMDBuildOverwrites cmdOverwrites;
@@ -155,20 +158,6 @@ void loadBuildConfig(Path file)
     build.include(commands);
     build.include(cmdOverwrites);
 
-    if (build.target == build.host)
-    {
-        if (build.host == buildTriplet)
-            build.type = ToolchainType.native;
-        else
-            build.type = ToolchainType.cross_native;
-    }
-    else
-    {
-        if (build.host == buildTriplet)
-            build.type = ToolchainType.cross;
-        else
-            build.type = ToolchainType.canadian;
-    }
     endSectionLog();
 }
 
@@ -249,7 +238,7 @@ struct BuildConfig
     @SerializedName("sysroot_prefix") string sysrootPrefix = "/";
     @SerializedName("patch_dirs") string[] localPatchDirs;
 
-    @SerializeIgnore ToolchainType type;
+    string type = "";
 
     BuildCommand gmp, mpfr, mpc, linux, binutils, glibc, w32api, gcc;
     @SerializedName("gcc_stage1") BuildCommand gccStage1;
@@ -345,10 +334,24 @@ struct MainConfig
         target = config.target;
         arch = config.arch;
         constants = config.constants;
-        type = config.type;
         sysrootPrefix = config.sysrootPrefix;
         localPatchDirs = config.localPatchDirs;
         
+        if (build.target == build.host)
+        {
+            if (build.host == buildTriplet)
+                build.type = ToolchainType.native;
+            else
+                build.type = ToolchainType.cross_native;
+        }
+        else
+        {
+            if (build.host == buildTriplet)
+                build.type = ToolchainType.cross;
+            else
+                build.type = ToolchainType.canadian;
+        }
+
         mpc.commands["main"] = config.mpc;
         mpfr.commands["main"] = config.mpfr;
         gmp.commands["main"] = config.gmp;
@@ -373,6 +376,9 @@ struct MainConfig
         overwriteIfSet(gcc.file, cmdOverwrites.gccFile);
         overwriteIfSet(gcc.suburl, cmdOverwrites.gccSuburl);
         overwriteIfSet(gcc.md5, cmdOverwrites.gccMD5);
+
+        if(!overwrite.type.isNull)
+            type = overwrite.type;
     }
 }
 
