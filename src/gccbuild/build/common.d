@@ -87,10 +87,15 @@ public:
     }
 }
 
-string updatePathVar(Path additional)
+string updatePathVar(Path additional, bool prepend = true)
 {
     auto oldPath = environment["PATH"];
-    auto newPath = oldPath ~ ":" ~ additional.toString();
+    string newPath;
+    if(prepend)
+        newPath = additional.toString() ~ ":" ~ oldPath;
+    else
+        newPath = oldPath ~ ":" ~ additional.toString();
+
     environment["PATH"] = newPath;
     yap("Updated path: ", oldPath, " => ", newPath);
     return oldPath;
