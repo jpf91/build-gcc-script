@@ -15,7 +15,7 @@ void patchSources()
         patchComponent(*component);
     }
 
-    if(!gdcSourcePath.empty)
+    if(!gdcSourcePath.empty && build.gcc.wasExtracted)
     {
         writeBulletPoint("Merging GDC into GCC");
         auto oldCWD = pushCWD(Path(gdcSourcePath));
