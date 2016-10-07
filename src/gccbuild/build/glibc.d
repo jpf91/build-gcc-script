@@ -26,9 +26,8 @@ void buildGlibc()
          */
         Path("configparms").writeFile("slibdir=" ~ mlibDir.toString() ~ "\n");
 
-        runBuildCommand(comp.configureFile.toString(), comp.commands["main"], "configure", extraVars);
-        runBuildCommand("make", comp.commands["main"], "make", extraVars);
-        runBuildCommand("make", comp.commands["main"], "make_install", extraVars);
+        extraVars["CONFIGURE"] = comp.configureFile.toString();
+        runBuildCommands(comp.cmdVariants["main"], extraVars);
         endBulletPoint();
     }
 

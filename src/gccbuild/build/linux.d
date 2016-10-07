@@ -11,8 +11,7 @@ void installLinuxHeaders()
     runCollectLog("cp -R --reflink=auto " ~ comp.sourceFolder.toString() ~ " " ~ comp.buildFolder.toString());
     auto saveCWD = comp.buildFolder.pushCWD();
 
-    runBuildCommand("make", comp.commands["main"], "make_headers_check");
-    runBuildCommand("make", comp.commands["main"], "make_headers_install");
+    runBuildCommands(comp.cmdVariants["main"]);
 
     if(!keepBuildFiles)
         rmdirRecurse(comp.buildFolder);

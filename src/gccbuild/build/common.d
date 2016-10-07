@@ -5,23 +5,17 @@ import gccbuild, scriptlike;
 /**
  * type is used to lookup arguments for the command in the component
  */
-void runBuildCommand(string baseCommand, BuildCommand args, string type, string[string] extraVars = string[string].init)
+void runBuildCommands(BuildCommand args, string[string] extraVars = string[string].init)
 {
-    string argString = "";
-    string[string] extraEnv;
-
-    if(auto argPtr = type in args.args)
-        argString = *argPtr;
-    if(auto envPtr = type in args.env)
-        extraEnv = *envPtr;
-
     auto scriptVars = buildVariables.dup;
     foreach(key, val; extraVars)
         scriptVars[key] = val;
 
-    auto cmd = baseCommand ~ " " ~ substituteVars(argString, scriptVars);
-
-    runCollectLog(cmd);
+    foreach(cmd; args.commands)
+    {
+        cmd = cmd.substituteVars(scriptVars);
+        runCollectLog(cmd);
+    }
 }
 
 string substituteVars(string text, string[string] vars)

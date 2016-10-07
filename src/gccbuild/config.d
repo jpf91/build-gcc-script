@@ -252,13 +252,13 @@ struct MainConfig
         // Total url is url | mirror ~ suburl | mirror ~ filename
         string suburl;
 
-        @SerializeIgnore BuildCommand[string] commands;
+        @SerializeIgnore BuildCommand[string] cmdVariants;
         @SerializeIgnore bool wasExtracted = false;
 
         // Whether this component is specified in config file
         @property bool isInConfig()
         {
-            return commands["main"].args.length != 0;
+            return cmdVariants["main"].commands.length != 0;
         }
 
         @property Path localFile()
@@ -352,15 +352,15 @@ struct MainConfig
                 build.type = ToolchainType.canadian;
         }
 
-        mpc.commands["main"] = config.mpc;
-        mpfr.commands["main"] = config.mpfr;
-        gmp.commands["main"] = config.gmp;
-        glibc.commands["main"] = config.glibc;
-        binutils.commands["main"] = config.binutils;
-        linux.commands["main"] = config.linux;
-        w32api.commands["main"] = config.w32api;
-        gcc.commands["main"] = config.gcc;
-        gcc.commands["stage1"] = config.gccStage1;
+        mpc.cmdVariants["main"] = config.mpc;
+        mpfr.cmdVariants["main"] = config.mpfr;
+        gmp.cmdVariants["main"] = config.gmp;
+        glibc.cmdVariants["main"] = config.glibc;
+        binutils.cmdVariants["main"] = config.binutils;
+        linux.cmdVariants["main"] = config.linux;
+        w32api.cmdVariants["main"] = config.w32api;
+        gcc.cmdVariants["main"] = config.gcc;
+        gcc.cmdVariants["stage1"] = config.gccStage1;
     }
 
     void include(CMDBuildOverwrites overwrite)
@@ -406,9 +406,7 @@ enum BuildMode
 
 struct BuildCommand
 {
-    alias KeyValue = string[string];
-    KeyValue args;
-    KeyValue[string] env;
+    string[] commands;
 }
 
 struct MultilibEntry
