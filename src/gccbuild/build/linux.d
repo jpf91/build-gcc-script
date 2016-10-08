@@ -11,7 +11,7 @@ void installLinuxHeaders()
     runCollectLog("cp -R --reflink=auto " ~ comp.sourceFolder.toString() ~ " " ~ comp.buildFolder.toString());
     auto saveCWD = comp.buildFolder.pushCWD();
 
-    runBuildCommands(comp.cmdVariants["main"]);
+    runBuildCommands(comp.cmdVariants["main"].commands);
 
     if(!keepBuildFiles)
         rmdirRecurse(comp.buildFolder);

@@ -8,7 +8,7 @@ void buildBinutils()
     startSection("Building binutils");
     auto saveCWD = comp.prepareBuildDir();
 
-    runBuildCommands(comp.cmdVariants["main"], ["CONFIGURE": comp.configureFile.toString()]);
+    runBuildCommands(comp.cmdVariants["main"].commands, ["CONFIGURE": comp.configureFile.toString()]);
 
     if(!keepBuildFiles)
         rmdirRecurse(comp.buildFolder);

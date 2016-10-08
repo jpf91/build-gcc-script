@@ -258,7 +258,7 @@ struct MainConfig
         // Whether this component is specified in config file
         @property bool isInConfig()
         {
-            return cmdVariants["main"].commands.length != 0;
+            return cmdVariants["main"].commands.length != 0 || cmdVariants["main"].multiCommands.length != 0;
         }
 
         @property Path localFile()
@@ -407,6 +407,7 @@ enum BuildMode
 struct BuildCommand
 {
     string[] commands;
+    @SerializedName("multi_commands") string[][] multiCommands;
 }
 
 struct MultilibEntry

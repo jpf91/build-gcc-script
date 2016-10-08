@@ -9,26 +9,40 @@ void buildGlibc()
     startSection("Building glibc");
     auto oldPath = updatePathVar(binDirStage1);
 
-    foreach(multilib; build.multilibs)
+    if(comp.cmdVariants["main"].multiCommands.empty)
     {
-        writeBulletPoint("Multilib variant: " ~ (multilib.isDefaultLib ? "default" : multilib.args));
-        auto saveCWD = comp.prepareBuildDir();
+        foreach(multilib; build.multilibs)
+        {
+            writeBulletPoint("Multilib variant: " ~ (multilib.isDefaultLib ? "default" : multilib.args));
+            auto saveCWD = comp.prepareBuildDir();
 
-        auto mlibDir = Path("/") ~ Path(build.relativeSysrootPrefix) ~ Path("lib") ~ Path(multilib.osFolder);
-        string[string] extraVars;
-        extraVars["DIR_MULTILIB"] = mlibDir.toString();
-        extraVars["MULTILIB_ARGS"] = multilib.args;
+            auto mlibDir = Path("/") ~ Path(build.relativeSysrootPrefix) ~ Path("lib") ~ Path(multilib.osFolder);
+            string[string] extraVars;
+            extraVars["DIR_MULTILIB"] = mlibDir.toString();
+            extraVars["MULTILIB_ARGS"] = multilib.args;
 
-        /* 
-         * stupid glibc messes up slibdir generation when not using a /usr prefix.
-         * We could just use a /usr prefix instead, but then glibc will copy some files into /$LIBDIR and some in /usr/$LIBDIR 
-         * https://sourceware.org/glibc/wiki/FAQ
-         */
-        Path("configparms").writeFile("slibdir=" ~ mlibDir.toString() ~ "\n");
+            /* 
+             * stupid glibc messes up slibdir generation when not using a /usr prefix.
+             * We could just use a /usr prefix instead, but then glibc will copy some files into /$LIBDIR and some in /usr/$LIBDIR 
+             * https://sourceware.org/glibc/wiki/FAQ
+             */
+            Path("configparms").writeFile("slibdir=" ~ mlibDir.toString() ~ "\n");
 
-        extraVars["CONFIGURE"] = comp.configureFile.toString();
-        runBuildCommands(comp.cmdVariants["main"], extraVars);
-        endBulletPoint();
+            extraVars["CONFIGURE"] = comp.configureFile.toString();
+            runBuildCommands(comp.cmdVariants["main"].commands, extraVars);
+            endBulletPoint();
+        }
+    }
+    else
+    {
+        foreach(i, commands; comp.cmdVariants["main"].multiCommands)
+        {
+            writeBulletPoint("Custom multilib command run: " ~ to!string(i));
+            auto saveCWD = comp.prepareBuildDir();
+
+            runBuildCommands(commands, ["CONFIGURE": comp.configureFile.toString()]);
+            endBulletPoint();
+        }
     }
 
     writeBulletPoint("Cleaning up sysroot");

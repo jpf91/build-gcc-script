@@ -5,13 +5,13 @@ import gccbuild, scriptlike;
 /**
  * type is used to lookup arguments for the command in the component
  */
-void runBuildCommands(BuildCommand args, string[string] extraVars = string[string].init)
+void runBuildCommands(string[] commands, string[string] extraVars = string[string].init)
 {
     auto scriptVars = buildVariables.dup;
     foreach(key, val; extraVars)
         scriptVars[key] = val;
 
-    foreach(cmd; args.commands)
+    foreach(cmd;commands)
     {
         cmd = cmd.substituteVars(scriptVars);
         runCollectLog(cmd);
