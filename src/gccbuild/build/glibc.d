@@ -21,13 +21,6 @@ void buildGlibc()
             extraVars["DIR_MULTILIB"] = mlibDir.toString();
             extraVars["MULTILIB_ARGS"] = multilib.args;
 
-            /* 
-             * stupid glibc messes up slibdir generation when not using a /usr prefix.
-             * We could just use a /usr prefix instead, but then glibc will copy some files into /$LIBDIR and some in /usr/$LIBDIR 
-             * https://sourceware.org/glibc/wiki/FAQ
-             */
-            Path("configparms").writeFile("slibdir=" ~ mlibDir.toString() ~ "\n");
-
             extraVars["CONFIGURE"] = comp.configureFile.toString();
             runBuildCommands(comp.cmdVariants["main"].commands, extraVars);
             endBulletPoint();
