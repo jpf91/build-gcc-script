@@ -1,4 +1,4 @@
-﻿module gccbuild.download;
+module gccbuild.download;
 
 import scriptlike, gccbuild, std.digest.md;
 
@@ -7,12 +7,12 @@ void downloadSources()
 
     startSection("Fetching source files");
 
-    foreach(name, component; build.configuredComponents)
+    foreach (name, component; build.configuredComponents)
     {
         downloadComponent(name, *component);
     }
 
-    if(!build.glibcPorts.file.empty)
+    if (!build.glibcPorts.file.empty)
         downloadComponent("glibc_ports", build.glibcPorts);
 
     endSection();
@@ -26,7 +26,7 @@ void downloadComponent(string name, MainConfig.Component component)
         writeBulletPoint("Found " ~ component.file ~ " (cached)");
         if (verifyCachedSources)
             enforceChecksum(dlPath, component.md5);
-        
+
         endBulletPoint();
     }
     else
@@ -35,25 +35,25 @@ void downloadComponent(string name, MainConfig.Component component)
         writeBulletPoint("Downloading " ~ component.file ~ forced ~ "...");
         tryMkdirRecurse(dlPath.dirName);
         tryRemove(dlPath);
-        
-        string[] urls = map!(a => component.suburl.empty
-            ? a ~ component.file : a ~ component.suburl)(mirrors[name]).array;
-        if(!component.url.empty)
+
+        string[] urls = map!(a => component.suburl.empty ? a ~ component.file : a ~ component
+            .suburl)(mirrors[name]).array;
+        if (!component.url.empty)
             urls = [component.url] ~ urls;
-        
-        foreach(url; urls)
+
+        foreach (url; urls)
         {
             try
             {
                 runCollectLog(mixin(interp!"wget ${url} -O ${dlPath}"));
                 break;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 tryRemove(dlPath);
             }
         }
-        
+
         failEnforcec(dlPath.exists, "Failed to find a working mirror for ", component.file);
         enforceChecksum(dlPath, component.md5);
         endBulletPoint();
@@ -62,7 +62,7 @@ void downloadComponent(string name, MainConfig.Component component)
 
 void enforceChecksum(Path file, string sum)
 {
-    if(!verifyFile(file, sum))
+    if (!verifyFile(file, sum))
         failc("Invalid MD5 of ", file);
 }
 

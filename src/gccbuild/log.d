@@ -1,4 +1,4 @@
-﻿module gccbuild.log;
+module gccbuild.log;
 
 import scriptlike;
 
@@ -6,7 +6,7 @@ private File logFile;
 
 void writelnLog(T...)(T args)
 {
-    if(!logFile.isOpen)
+    if (!logFile.isOpen)
         return;
 
     logFile.writeln(args);
@@ -14,10 +14,10 @@ void writelnLog(T...)(T args)
 
 void writeLogCMD(string text)
 {
-    if(!logFile.isOpen)
+    if (!logFile.isOpen)
         return;
 
-    foreach(line; text.lineSplitter())
+    foreach (line; text.lineSplitter())
         logFile.writeln("           ", line);
     logFile.flush();
 }
@@ -26,7 +26,7 @@ void intializeLog(Path path)
 {
     void echoLogger(string text)
     {
-        if(!logFile.isOpen)
+        if (!logFile.isOpen)
             return;
 
         logFile.writeln("       ", text);
@@ -42,12 +42,12 @@ private SysTime startTime;
 
 void startSectionLog(string text)
 {
-    if(!logFile.isOpen)
+    if (!logFile.isOpen)
         return;
 
     startTime = Clock.currTime;
     static bool first = true;
-    
+
     if (first)
         first = false;
     else
@@ -66,7 +66,7 @@ void endSectionLog()
 
 void endSectionLog(Duration dur)
 {
-    if(logFile.isOpen)
+    if (logFile.isOpen)
         logFile.writefln(":   (%s)", dur);
 }
 
@@ -97,7 +97,7 @@ void closeLog()
 string runCollectLog(string command)
 {
     auto result = tryRunCollectLog(command);
-    if(result.status != 0)
+    if (result.status != 0)
         throw new ErrorLevelException(result.status, command, result.output);
     return result.output;
 }

@@ -1,4 +1,4 @@
-﻿module gccbuild.build.common;
+module gccbuild.build.common;
 
 import gccbuild, scriptlike;
 
@@ -8,10 +8,10 @@ import gccbuild, scriptlike;
 void runBuildCommands(string[] commands, string[string] extraVars = string[string].init)
 {
     auto scriptVars = buildVariables.dup;
-    foreach(key, val; extraVars)
+    foreach (key, val; extraVars)
         scriptVars[key] = val;
 
-    foreach(cmd;commands)
+    foreach (cmd; commands)
     {
         cmd = cmd.substituteVars(scriptVars);
         runCollectLog(cmd);
@@ -23,18 +23,19 @@ string substituteVars(string text, string[string] vars)
     auto result = appender!string();
 
     auto remain = text;
-    while(!remain.empty)
+    while (!remain.empty)
     {
         auto parts = remain.findSplit("${");
         result ~= parts[0];
         remain = parts[2];
 
-        if(parts)
+        if (parts)
         {
             parts = remain.findSplit("}");
-            failEnforcec(cast(bool)parts, "Can't find closing } in macro:", text);
+            failEnforcec(cast(bool) parts, "Can't find closing } in macro:", text);
             auto val = parts[0] in vars;
-            failEnforce(val != null, "Couldn't find replacement value for ", parts[0], " in ", text);
+            failEnforce(val != null, "Couldn't find replacement value for ",
+                parts[0], " in ", text);
             result ~= *val;
             remain = parts[2];
         }
@@ -69,12 +70,12 @@ private:
     bool autoPop;
 
 public:
-    ~this()
+     ~this()
     {
-        if(autoPop)
+        if (autoPop)
             saveDir.chdir();
     }
-    
+
     void popCWD()
     {
         saveDir.chdir();
@@ -85,7 +86,7 @@ string updatePathVar(Path additional, bool prepend = true)
 {
     auto oldPath = environment["PATH"];
     string newPath;
-    if(prepend)
+    if (prepend)
         newPath = additional.toString() ~ ":" ~ oldPath;
     else
         newPath = oldPath ~ ":" ~ additional.toString();

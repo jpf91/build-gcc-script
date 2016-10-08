@@ -1,4 +1,4 @@
-﻿module gccbuild.build.linux;
+module gccbuild.build.linux;
 
 import scriptlike, gccbuild;
 
@@ -8,12 +8,13 @@ void installLinuxHeaders()
     startSection("Installing linux headers");
 
     comp.buildFolder.tryRmdirRecurse();
-    runCollectLog("cp -R --reflink=auto " ~ comp.sourceFolder.toString() ~ " " ~ comp.buildFolder.toString());
+    runCollectLog(
+        "cp -R --reflink=auto " ~ comp.sourceFolder.toString() ~ " " ~ comp.buildFolder.toString());
     auto saveCWD = comp.buildFolder.pushCWD();
 
     runBuildCommands(comp.cmdVariants["main"].commands);
 
-    if(!keepBuildFiles)
+    if (!keepBuildFiles)
         rmdirRecurse(comp.buildFolder);
     endSection();
 }

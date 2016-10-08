@@ -1,4 +1,4 @@
-﻿module gccbuild.build.glibc;
+module gccbuild.build.glibc;
 
 import scriptlike, gccbuild;
 
@@ -9,14 +9,16 @@ void buildGlibc()
     startSection("Building glibc");
     auto oldPath = updatePathVar(binDirStage1);
 
-    if(comp.cmdVariants["main"].multiCommands.empty)
+    if (comp.cmdVariants["main"].multiCommands.empty)
     {
-        foreach(multilib; build.multilibs)
+        foreach (multilib; build.multilibs)
         {
-            writeBulletPoint("Multilib variant: " ~ (multilib.isDefaultLib ? "default" : multilib.args));
+            writeBulletPoint(
+                "Multilib variant: " ~ (multilib.isDefaultLib ? "default" : multilib.args));
             auto saveCWD = comp.prepareBuildDir();
 
-            auto mlibDir = Path("/") ~ Path(build.relativeSysrootPrefix) ~ Path("lib") ~ Path(multilib.osFolder);
+            auto mlibDir = Path("/") ~ Path(build.relativeSysrootPrefix) ~ Path("lib") ~ Path(
+                multilib.osFolder);
             string[string] extraVars;
             extraVars["DIR_MULTILIB"] = mlibDir.toString();
             extraVars["MULTILIB_ARGS"] = multilib.args;
@@ -28,12 +30,12 @@ void buildGlibc()
     }
     else
     {
-        foreach(i, commands; comp.cmdVariants["main"].multiCommands)
+        foreach (i, commands; comp.cmdVariants["main"].multiCommands)
         {
             writeBulletPoint("Custom multilib command run: " ~ to!string(i));
             auto saveCWD = comp.prepareBuildDir();
 
-            runBuildCommands(commands, ["CONFIGURE": comp.configureFile.toString()]);
+            runBuildCommands(commands, ["CONFIGURE" : comp.configureFile.toString()]);
             endBulletPoint();
         }
     }
@@ -49,7 +51,7 @@ void buildGlibc()
 
     restorePathVar(oldPath);
 
-    if(!keepBuildFiles)
+    if (!keepBuildFiles)
         rmdirRecurse(comp.buildFolder);
     endSection();
 }

@@ -1,4 +1,4 @@
-﻿module gccbuild.build.gcc;
+module gccbuild.build.gcc;
 
 import scriptlike, gccbuild;
 
@@ -9,9 +9,10 @@ void buildStage1GCC()
     auto saveCWD = comp.prepareBuildDir();
     auto oldPath = updatePathVar(binDirStage1);
 
-    runBuildCommands(comp.cmdVariants["stage1"].commands, ["CONFIGURE": comp.configureFile.toString()]);
+    runBuildCommands(comp.cmdVariants["stage1"].commands,
+        ["CONFIGURE" : comp.configureFile.toString()]);
     restorePathVar(oldPath);
-    if(!keepBuildFiles)
+    if (!keepBuildFiles)
         rmdirRecurse(comp.buildFolder);
     endSection();
 }
@@ -28,11 +29,12 @@ void detectMultilib(string compiler)
     startSection("Detecting available multilibs");
 
     auto output = runCollectLog(compiler ~ " --print-multi-lib");
-    foreach(line; output.lineSplitter)
+    foreach (line; output.lineSplitter)
     {
         MultilibEntry entry;
         auto parts = line.findSplit(";");
-        failEnforcec(cast(bool)parts, "Invalid format returned from --print-multi-lib", line);
+        failEnforcec(cast(bool) parts, "Invalid format returned from --print-multi-lib",
+            line);
         entry.gccFolder = parts[0];
         entry.args = parts[2].splitter("@").filter!(a => !a.empty).map!(a => "-" ~ a).join(" ");
 
@@ -45,9 +47,11 @@ void detectMultilib(string compiler)
         writeBulletPoint("No multilib support detected");
     else
     {
-        foreach(lib; build.multilibs)
+        foreach (lib; build.multilibs)
         {
-            writeBulletPoint("args='" ~ lib.args ~ "' osDir='" ~ lib.osFolder ~ "' gccDir='" ~ lib.gccFolder ~ "'");
+            writeBulletPoint(
+                "args='" ~ lib.args ~ "' osDir='" ~ lib.osFolder ~ "' gccDir='" ~ lib.gccFolder
+                ~ "'");
         }
     }
     endSection();
@@ -59,12 +63,13 @@ void buildFinalGCC()
     startSection("Building final gcc");
     auto saveCWD = comp.prepareBuildDir();
     auto oldPath = updatePathVar(binDir);
-    
-    runBuildCommands(comp.cmdVariants["main"].commands, ["CONFIGURE": comp.configureFile.toString()]);
+
+    runBuildCommands(comp.cmdVariants["main"].commands,
+        ["CONFIGURE" : comp.configureFile.toString()]);
 
     restorePathVar(oldPath);
 
-    if(!keepBuildFiles)
+    if (!keepBuildFiles)
         rmdirRecurse(comp.buildFolder);
     endSection();
 }

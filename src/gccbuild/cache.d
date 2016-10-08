@@ -1,2 +1,1 @@
-﻿module gccbuild.cache;
-
+module gccbuild.cache;

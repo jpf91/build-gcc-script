@@ -1,4 +1,4 @@
-﻿module gccbuild.config;
+module gccbuild.config;
 
 import gccbuild, scriptlike, painlessjson, std.json;
 
@@ -22,9 +22,9 @@ string gdcSourcePath;
 
 @property string hostStrip()
 {
-    if(!hostStripCMD.empty)
+    if (!hostStripCMD.empty)
         return hostStripCMD;
-    else if(build.type == ToolchainType.native)
+    else if (build.type == ToolchainType.native)
         return "strip";
     else
         return build.host ~ "-strip";
@@ -34,15 +34,15 @@ string gdcSourcePath;
 {
     Path[] result;
     result ~= mainPatchDir;
-    foreach(dir; build.localPatchDirs)
+    foreach (dir; build.localPatchDirs)
     {
         // Make sure relative Paths are relative to the build config specifying them
         auto path = Path(dir);
-        if(!path.isAbsolute)
+        if (!path.isAbsolute)
             path = path.absolutePath(buildConfig.dirName);
         result ~= path;
     }
-    foreach(dir; patchDirsCMD)
+    foreach (dir; patchDirsCMD)
         result ~= Path(dir);
 
     return result;
@@ -131,7 +131,7 @@ void loadMirrors()
     startSectionLog("Loading mirror information");
     try
         mirrors = fromJSON!(typeof(mirrors))(mirrorFile.readText().parseJSON());
-    catch(Exception e)
+    catch (Exception e)
         failc("Couldn't load mirror file ", mirrorFile, ": ", e);
     endSectionLog();
 }
@@ -141,7 +141,7 @@ void loadSourceConfig(Path file)
     startSectionLog("Loading build sources configuration");
     try
         build = fromJSON!MainConfig(file.readText().parseJSON());
-    catch(Exception e)
+    catch (Exception e)
         failc("Couldn't load build sources configuration ", file, ": ", e);
     endSectionLog();
 }
@@ -152,7 +152,7 @@ void loadBuildConfig(Path file)
     BuildConfig commands;
     try
         commands = fromJSON!BuildConfig(file.readText().parseJSON());
-    catch(Exception e)
+    catch (Exception e)
         failc("Couldn't load build configuration ", file, ": ", e);
 
     build.include(commands);
@@ -179,21 +179,22 @@ void setupBuildVariables()
     buildVariables["DIR_SYSROOT_WITH_PREFIX"] = (sysrootDir ~ build.relativeSysrootPrefix).toString();
     buildVariables["DIR_TOOLCHAIN_STAGE1"] = toolchainDirStage1.toString();
     buildVariables["DIR_SYSROOT_STAGE1"] = sysrootDirStage1.toString();
-    buildVariables["DIR_SYSROOT_STAGE1_WITH_PREFIX"] = (sysrootDirStage1 ~ build.relativeSysrootPrefix).toString();
+    buildVariables["DIR_SYSROOT_STAGE1_WITH_PREFIX"] = (
+        sysrootDirStage1 ~ build.relativeSysrootPrefix).toString();
     buildVariables["TARGET_GCC"] = build.target ~ "-gcc";
 
     // overwrite from build.json
-    foreach(key, val; build.constants)
+    foreach (key, val; build.constants)
     {
         buildVariables[key] = val;
     }
     // overwrites from cmd
-    foreach(key, val; cmdVariables)
+    foreach (key, val; cmdVariables)
     {
         buildVariables[key] = val;
     }
 
-    foreach(key, val; buildVariables)
+    foreach (key, val; buildVariables)
     {
         yap(key, "=", val);
     }
@@ -207,7 +208,7 @@ void dumpConfiguration()
     writeBulletPoint(mixin(interp!"Build: ${buildTriplet}"));
     writeBulletPoint(mixin(interp!"Host: ${build.host}"));
     writeBulletPoint(mixin(interp!"Target: ${build.target}"));
-    if(build.targetType == HostType.linux)
+    if (build.targetType == HostType.linux)
         writeBulletPoint(mixin(interp!"Kernel ARCH: ${build.arch}"));
     endSection();
 }
@@ -217,7 +218,7 @@ auto namedFields(T, A...)(ref T instance)
     static string generateMixin(string[] fields)
     {
         string result = "return only(";
-        foreach(i, entry; fields)
+        foreach (i, entry; fields)
         {
             if (i != 0)
                 result ~= ", ";
@@ -226,7 +227,7 @@ auto namedFields(T, A...)(ref T instance)
         result ~= ");";
         return result;
     }
-    
+
     mixin(generateMixin([A]));
 }
 
@@ -258,12 +259,13 @@ struct MainConfig
         // Whether this component is specified in config file
         @property bool isInConfig()
         {
-            return cmdVariants["main"].commands.length != 0 || cmdVariants["main"].multiCommands.length != 0;
+            return cmdVariants["main"].commands.length != 0
+                || cmdVariants["main"].multiCommands.length != 0;
         }
 
         @property Path localFile()
         {
-            return downloadDir ~ this.file;
+            return downloadDir ~this.file;
         }
 
         @property Path baseDirName()
@@ -312,7 +314,7 @@ struct MainConfig
 
     @property HostType targetType()
     {
-        if(target.toLower().canFind("mingw"))
+        if (target.toLower().canFind("mingw"))
             return HostType.mingw;
         else
             return HostType.linux;
@@ -320,7 +322,8 @@ struct MainConfig
 
     @property componentRange()
     {
-        return this.namedFields!(MainConfig, "mpc", "mpfr", "gmp", "glibc", "binutils", "linux", "w32api", "gcc");
+        return this.namedFields!(MainConfig, "mpc", "mpfr", "gmp", "glibc",
+            "binutils", "linux", "w32api", "gcc");
     }
 
     @property configuredComponents()
@@ -336,7 +339,7 @@ struct MainConfig
         constants = config.constants;
         sysrootPrefix = config.sysrootPrefix;
         localPatchDirs = config.localPatchDirs;
-        
+
         if (build.target == build.host)
         {
             if (build.host == buildTriplet)
@@ -367,7 +370,7 @@ struct MainConfig
     {
         void overwriteIfSet(ref string oldVal, string newVal)
         {
-            if(!newVal.empty)
+            if (!newVal.empty)
                 oldVal = newVal;
         }
 
@@ -377,7 +380,7 @@ struct MainConfig
         overwriteIfSet(gcc.suburl, cmdOverwrites.gccSuburl);
         overwriteIfSet(gcc.md5, cmdOverwrites.gccMD5);
 
-        if(!overwrite.type.isNull)
+        if (!overwrite.type.isNull)
             type = overwrite.type;
     }
 }
@@ -415,7 +418,7 @@ struct MultilibEntry
     string gccFolder;
     string args;
     string osFolder;
-    
+
     @property bool isDefaultLib()
     {
         return gccFolder == ".";

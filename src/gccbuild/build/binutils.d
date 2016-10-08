@@ -1,4 +1,4 @@
-﻿module gccbuild.build.binutils;
+module gccbuild.build.binutils;
 
 import scriptlike, gccbuild;
 
@@ -8,9 +8,10 @@ void buildBinutils()
     startSection("Building binutils");
     auto saveCWD = comp.prepareBuildDir();
 
-    runBuildCommands(comp.cmdVariants["main"].commands, ["CONFIGURE": comp.configureFile.toString()]);
+    runBuildCommands(comp.cmdVariants["main"].commands,
+        ["CONFIGURE" : comp.configureFile.toString()]);
 
-    if(!keepBuildFiles)
+    if (!keepBuildFiles)
         rmdirRecurse(comp.buildFolder);
     endSection();
 }

@@ -1,4 +1,4 @@
-﻿module gccbuild.console;
+module gccbuild.console;
 
 import consoled, scriptlike, gccbuild;
 
@@ -18,7 +18,7 @@ void startSection(string text, bool log = true)
     resetFontStyle();
     writecln();
 
-    if(log)
+    if (log)
         startSectionLog(text);
 }
 
@@ -26,7 +26,7 @@ void endSection(bool log = true)
 {
     auto dur = Clock.currTime - startTime;
     writefln("%*s", consoled.width, "(" ~ dur.durationToString() ~ ")");
-    if(log)
+    if (log)
         endSectionLog(dur);
 }
 
@@ -64,7 +64,7 @@ void failc(T...)(T args)
 
 void failEnforcec(T...)(bool cond, T args)
 {
-    if(!cond)
+    if (!cond)
         failc(args);
 }
 
@@ -75,7 +75,7 @@ class SilentFail : Exception
         super(null);
     }
 
-    private static Fail opCall(string file=__FILE__, int line=__LINE__)
+    private static Fail opCall(string file = __FILE__, int line = __LINE__)
     {
         throw cast(SilentFail) cast(void*) SilentFail.classinfo.init;
     }
@@ -101,30 +101,38 @@ string durationToString(Duration dur) nothrow
         else static if (units == "usecs")
             unit = "us";
         else
-            unit = plural ? units : units[0 .. $-1];
+            unit = plural ? units : units[0 .. $ - 1];
         res ~= to!string(val);
         res ~= " ";
         res ~= unit;
     }
-    
-    if (_hnsecs == 0) return "0 hnsecs";
-    
-    template TT(T...) { alias T TT; }
+
+    if (_hnsecs == 0)
+        return "0 hnsecs";
+
+    template TT(T...)
+    {
+        alias TT = T;
+    }
+
     alias units = TT!("weeks", "days", "hours", "minutes", "seconds", "msecs", "usecs");
-    
-    long hnsecs = _hnsecs; string res; uint pos;
+
+    long hnsecs = _hnsecs;
+    string res;
+    uint pos;
     size_t written = 0;
     foreach (unit; units)
     {
         if (auto val = splitUnitsFromHNSecs!unit(hnsecs))
         {
-            if(written != 0)
+            if (written != 0)
                 res ~= ", ";
             appUnitVal!unit(res, val);
-            if(++written == 2)
+            if (++written == 2)
                 break;
         }
-        if (hnsecs == 0) break;
+        if (hnsecs == 0)
+            break;
     }
     if (hnsecs != 0 && written < 2)
     {
@@ -134,18 +142,13 @@ string durationToString(Duration dur) nothrow
     return res;
 }
 
-long splitUnitsFromHNSecs(string units)(ref long hnsecs) @safe pure nothrow @nogc
-    if(units == "weeks" ||
-        units == "days" ||
-        units == "hours" ||
-        units == "minutes" ||
-        units == "seconds" ||
-        units == "msecs" ||
-        units == "usecs" ||
-        units == "hnsecs")
+long splitUnitsFromHNSecs(string units)(ref long hnsecs) @safe pure nothrow @nogc if (
+        units == "weeks" || units == "days" || units == "hours"
+        || units == "minutes" || units == "seconds" || units == "msecs"
+        || units == "usecs" || units == "hnsecs")
 {
     immutable value = convert!("hnsecs", units)(hnsecs);
     hnsecs -= convert!(units, "hnsecs")(value);
-    
+
     return value;
 }
