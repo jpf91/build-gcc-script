@@ -9,7 +9,7 @@ void buildGlibc()
     startSection("Building glibc");
     auto oldPath = updatePathVar(binDirStage1);
 
-    if (comp.cmdVariants["main"].multiCommands.empty)
+    if (comp.mainBuildCommand.multiCommands.empty)
     {
         foreach (multilib; build.multilibs)
         {
@@ -24,13 +24,13 @@ void buildGlibc()
             extraVars["MULTILIB_ARGS"] = multilib.args;
 
             extraVars["CONFIGURE"] = comp.configureFile.toString();
-            runBuildCommands(comp.cmdVariants["main"].commands, extraVars);
+            runBuildCommands(comp.mainBuildCommand.commands, extraVars);
             endBulletPoint();
         }
     }
     else
     {
-        foreach (i, commands; comp.cmdVariants["main"].multiCommands)
+        foreach (i, commands; comp.mainBuildCommand.multiCommands)
         {
             writeBulletPoint("Custom multilib command run: " ~ to!string(i));
             auto saveCWD = comp.prepareBuildDir();

@@ -13,9 +13,9 @@ void extractSources()
         extractComponent(component);
     }
 
-    if (build.glibc.isInConfig && !build.glibcPorts.file.empty)
+    if (build.glibc.isInConfig && build.glibcPorts)
     {
-        extractComponent(&build.glibcPorts);
+        extractComponent(build.glibcPorts);
         runCollectLog(
             "mv " ~ build.glibcPorts.sourceFolder.toString() ~ " " ~ (
             build.glibc.sourceFolder ~ "ports").toString());
@@ -24,7 +24,7 @@ void extractSources()
     endSection();
 }
 
-void extractComponent(MainConfig.Component* component)
+void extractComponent(Component component)
 {
     switch (component.file.extension)
     {

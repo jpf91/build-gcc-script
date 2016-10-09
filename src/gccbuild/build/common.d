@@ -14,7 +14,8 @@ void runBuildCommands(string[] commands, string[string] extraVars = string[strin
     foreach (cmd; commands)
     {
         cmd = cmd.substituteVars(scriptVars);
-        runCollectLog(cmd);
+        if (!cmd.empty)
+            runCollectLog(cmd);
     }
 }
 
@@ -49,7 +50,7 @@ string substituteVars(string text, string[string] vars)
  * 2) Create directory
  * 3) chdir into directory
  */
-auto prepareBuildDir(MainConfig.Component component)
+auto prepareBuildDir(Component component)
 {
     component.buildFolder.tryRmdirRecurse();
     component.buildFolder.tryMkdirRecurse();

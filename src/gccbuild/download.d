@@ -9,16 +9,16 @@ void downloadSources()
 
     foreach (name, component; build.configuredComponents)
     {
-        downloadComponent(name, *component);
+        downloadComponent(name, component);
     }
 
-    if (!build.glibcPorts.file.empty)
+    if (build.glibcPorts)
         downloadComponent("glibc_ports", build.glibcPorts);
 
     endSection();
 }
 
-void downloadComponent(string name, MainConfig.Component component)
+void downloadComponent(string name, Component component)
 {
     auto dlPath = component.localFile;
     if (dlPath.exists && !forceDownload)

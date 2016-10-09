@@ -9,8 +9,7 @@ void buildStage1GCC()
     auto saveCWD = comp.prepareBuildDir();
     auto oldPath = updatePathVar(binDirStage1);
 
-    runBuildCommands(comp.cmdVariants["stage1"].commands,
-        ["CONFIGURE" : comp.configureFile.toString()]);
+    runBuildCommands(comp.stage1BuildCommand.commands, ["CONFIGURE" : comp.configureFile.toString()]);
     restorePathVar(oldPath);
     if (!keepBuildFiles)
         rmdirRecurse(comp.buildFolder);
@@ -64,8 +63,7 @@ void buildFinalGCC()
     auto saveCWD = comp.prepareBuildDir();
     auto oldPath = updatePathVar(binDir);
 
-    runBuildCommands(comp.cmdVariants["main"].commands,
-        ["CONFIGURE" : comp.configureFile.toString()]);
+    runBuildCommands(comp.mainBuildCommand.commands, ["CONFIGURE" : comp.configureFile.toString()]);
 
     restorePathVar(oldPath);
 

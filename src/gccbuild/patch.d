@@ -12,7 +12,7 @@ void patchSources()
     startSection("Patching sources");
     foreach (name, component; build.configuredComponents)
     {
-        patchComponent(*component);
+        patchComponent(component);
     }
 
     if (!gdcSourcePath.empty && build.gcc.wasExtracted)
@@ -25,7 +25,7 @@ void patchSources()
     endSection();
 }
 
-void patchComponent(MainConfig.Component component)
+void patchComponent(Component component)
 {
     if (!component.wasExtracted)
         writeBulletPoint(component.baseDirName.toString() ~ "... (skipped)");
@@ -41,7 +41,7 @@ void patchComponent(MainConfig.Component component)
     }
 }
 
-string[] getPatchList(MainConfig.Component component)
+string[] getPatchList(Component component)
 {
     string[string] patches;
 

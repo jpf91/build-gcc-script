@@ -222,7 +222,7 @@ auto namedFields(T, A...)(ref T instance)
         {
             if (i != 0)
                 result ~= ", ";
-            result ~= "tuple!(\"name\", \"value\")(\"" ~ entry ~ "\", &instance." ~ entry ~ ")";
+            result ~= "tuple!(\"name\", \"value\")(\"" ~ entry ~ "\", cast(Component)instance." ~ entry ~ ")";
         }
         result ~= ");";
         return result;
@@ -241,59 +241,13 @@ struct BuildConfig
 
     string type = "";
 
-    BuildCommand gmp, mpfr, mpc, linux, binutils, glibc, w32api, gcc;
+    BuildCommand gmp, mpfr, mpc, linux, binutils, w32api, gcc;
+    GlibcBuildCommand glibc;
     @SerializedName("gcc_stage1") BuildCommand gccStage1;
 }
 
 struct MainConfig
 {
-    static struct Component
-    {
-        string file, url, md5;
-        // Total url is url | mirror ~ suburl | mirror ~ filename
-        string suburl;
-
-        @SerializeIgnore BuildCommand[string] cmdVariants;
-        @SerializeIgnore bool wasExtracted = false;
-
-        // Whether this component is specified in config file
-        @property bool isInConfig()
-        {
-            return cmdVariants["main"].commands.length != 0
-                || cmdVariants["main"].multiCommands.length != 0;
-        }
-
-        @property Path localFile()
-        {
-            return downloadDir ~this.file;
-        }
-
-        @property Path baseDirName()
-        {
-            return Path(file.stripExt.stripExt);
-        }
-
-        Path getSourceFile(Path relFile)
-        {
-            return sourceFolder ~ relFile;
-        }
-
-        @property Path configureFile()
-        {
-            return getSourceFile(Path("configure"));
-        }
-
-        @property Path sourceFolder()
-        {
-            return extractDir ~ baseDirName;
-        }
-
-        @property Path buildFolder()
-        {
-            return buildDir ~ baseDirName;
-        }
-    }
-
     @SerializeIgnore string host;
     @SerializeIgnore string target;
     @SerializeIgnore string arch;
@@ -308,7 +262,9 @@ struct MainConfig
     @SerializeIgnore ToolchainType type;
     @SerializeIgnore string[] localPatchDirs;
 
-    Component mpc, mpfr, gmp, glibc, binutils, linux, w32api, gcc;
+    Component mpc, mpfr, gmp, binutils, linux, w32api;
+    GCCComponent gcc;
+    GlibcComponent glibc;
     // This is a special component: only a addon for glibc, don't build individually
     @SerializedName("glibc_ports") Component glibcPorts;
 
@@ -355,15 +311,24 @@ struct MainConfig
                 build.type = ToolchainType.canadian;
         }
 
-        mpc.cmdVariants["main"] = config.mpc;
-        mpfr.cmdVariants["main"] = config.mpfr;
-        gmp.cmdVariants["main"] = config.gmp;
-        glibc.cmdVariants["main"] = config.glibc;
-        binutils.cmdVariants["main"] = config.binutils;
-        linux.cmdVariants["main"] = config.linux;
-        w32api.cmdVariants["main"] = config.w32api;
-        gcc.cmdVariants["main"] = config.gcc;
-        gcc.cmdVariants["stage1"] = config.gccStage1;
+        void trySet(Component comp, BuildCommand com)
+        {
+            if (comp)
+                comp._mainBuildCommand = com;
+        }
+
+        trySet(mpc, config.mpc);
+        trySet(mpfr, config.mpfr);
+        trySet(gmp, config.gmp);
+        trySet(glibc, config.glibc);
+        trySet(binutils, config.binutils);
+        trySet(linux, config.linux);
+        trySet(w32api, config.w32api);
+        if (gcc)
+        {
+            gcc._mainBuildCommand = config.gcc;
+            gcc._stage1BuildCommand = config.gccStage1;
+        }
     }
 
     void include(CMDBuildOverwrites overwrite)
@@ -382,6 +347,82 @@ struct MainConfig
 
         if (!overwrite.type.isNull)
             type = overwrite.type;
+    }
+}
+
+class Component
+{
+private:
+    BuildCommand _mainBuildCommand;
+
+public:
+
+    string file, url, md5;
+    // Total url is url | mirror ~ suburl | mirror ~ filename
+    string suburl;
+
+    @property BuildCommand mainBuildCommand()
+    {
+        return _mainBuildCommand;
+    }
+
+    @SerializeIgnore bool wasExtracted = false;
+
+    @property Path localFile()
+    {
+        return downloadDir ~this.file;
+    }
+
+    @property Path baseDirName()
+    {
+        return Path(file.stripExt.stripExt);
+    }
+
+    Path getSourceFile(Path relFile)
+    {
+        return sourceFolder ~ relFile;
+    }
+
+    @property Path configureFile()
+    {
+        return getSourceFile(Path("configure"));
+    }
+
+    @property Path sourceFolder()
+    {
+        return extractDir ~ baseDirName;
+    }
+
+    @property Path buildFolder()
+    {
+        return buildDir ~ baseDirName;
+    }
+}
+
+// Whether this component is specified in config file
+@property bool isInConfig(Component c)
+{
+    return c !is null && c.mainBuildCommand !is null;
+}
+
+class GlibcComponent : Component
+{
+public:
+    override @property GlibcBuildCommand mainBuildCommand()
+    {
+        return cast(GlibcBuildCommand) _mainBuildCommand;
+    }
+}
+
+class GCCComponent : Component
+{
+private:
+    BuildCommand _stage1BuildCommand;
+
+public:
+    @property BuildCommand stage1BuildCommand()
+    {
+        return _stage1BuildCommand;
     }
 }
 
@@ -407,9 +448,13 @@ enum BuildMode
     patch
 }
 
-struct BuildCommand
+class BuildCommand
 {
     string[] commands;
+}
+
+class GlibcBuildCommand : BuildCommand
+{
     @SerializedName("multi_commands") string[][] multiCommands;
 }
 
