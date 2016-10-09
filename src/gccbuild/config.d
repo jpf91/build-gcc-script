@@ -56,6 +56,11 @@ CMDBuildOverwrites cmdOverwrites;
     return installDir ~ "stage1";
 }
 
+@property Path sysrootDirWithPrefix()
+{
+    return sysrootDir ~ build.relativeSysrootPrefix;
+}
+
 @property Path sysrootDir()
 {
     return toolchainDir ~ "sysroot";
@@ -160,7 +165,7 @@ void setupBuildVariables()
     buildVariables["DIR_TOOLCHAIN"] = toolchainDir.toString();
     buildVariables["DIR_SYSROOT"] = sysrootDir.toString();
     buildVariables["DIR_SYSROOT_PREFIX"] = build.sysrootPrefix;
-    buildVariables["DIR_SYSROOT_WITH_PREFIX"] = (sysrootDir ~ build.relativeSysrootPrefix).toString();
+    buildVariables["DIR_SYSROOT_WITH_PREFIX"] = sysrootDirWithPrefix.toString();
     buildVariables["DIR_TOOLCHAIN_STAGE1"] = toolchainDirStage1.toString();
     buildVariables["DIR_SYSROOT_STAGE1"] = sysrootDirStage1.toString();
     buildVariables["DIR_SYSROOT_STAGE1_WITH_PREFIX"] = (
@@ -293,6 +298,7 @@ struct BuildConfig
 
     BuildCommand gmp, mpfr, mpc, linux, binutils, w32api, gcc;
     GlibcBuildCommand glibc;
+    CleanupCommand cleanup;
     @SerializedName("gcc_stage1") BuildCommand gccStage1;
 }
 
@@ -326,6 +332,8 @@ struct MainConfig
     GlibcComponent glibc;
     // This is a special component: only a addon for glibc, don't build individually
     @SerializedName("glibc_ports") Component glibcPorts;
+
+    @SerializeIgnore CleanupCommand cleanup;
 
     @property HostType targetType()
     {
@@ -362,6 +370,7 @@ struct MainConfig
         localPatchDirsCross = config.localPatchDirsCross;
         localPatchDirsCrossNative = config.localPatchDirsCrossNative;
         localPatchDirsCanadian = config.localPatchDirsCanadian;
+        cleanup = config.cleanup;
 
         void trySet(Component comp, BuildCommand com)
         {
@@ -524,23 +533,34 @@ class BuildCommand
 {
     string[] commands;
     string[] variants;
-    @property bool matchesBuildType()
-    {
-        if (variants.empty)
-            return true;
+}
 
-        foreach (variant; variants)
-        {
-            if (variant == to!string(build.type))
-                return true;
-        }
+@property bool matchesBuildType(BuildCommand cmd)
+{
+    if (!cmd)
         return false;
+
+    if (cmd.variants.empty)
+        return true;
+
+    foreach (variant; cmd.variants)
+    {
+        if (variant == to!string(build.type))
+            return true;
     }
+    return false;
 }
 
 class GlibcBuildCommand : BuildCommand
 {
     @SerializedName("multi_commands") string[][] multiCommands;
+}
+
+class CleanupCommand : BuildCommand
+{
+    @SerializedName("strip_target") string[] stripTarget;
+    @SerializedName("strip_host") string[] stripHost;
+    string[] remove;
 }
 
 struct MultilibEntry

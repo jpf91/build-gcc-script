@@ -6,8 +6,17 @@ void cleanupToolchain(Duration totalTime)
 {
     startSection("Finalizing toolchain");
 
+    removeFolders();
     stripTargetLibraries();
     stripHostBinaries();
+
+    if (build.cleanup.matchesBuildType && !build.cleanup.commands.empty)
+    {
+        writeBulletPoint("Executing custom cleanup commands");
+        auto oldCWD = pushCWD(toolchainDir);
+        runBuildCommands(build.cleanup.commands);
+        endBulletPoint();
+    }
 
     writeBulletPoint("Writing GCC information");
     auto info = GCCInfo(build.target, build.host, build.multilibs);
@@ -35,6 +44,28 @@ struct GCCInfo
     MultilibEntry[] multilibs;
 }
 
+void removeFolders()
+{
+    writeBulletPoint("Removing unnecessary folders");
+    if (build.cleanup.matchesBuildType && !build.cleanup.remove.empty)
+    {
+        foreach (entry; build.cleanup.remove)
+        {
+            tryRmdirRecurse(toolchainDir ~ entry);
+        }
+    }
+    else
+    {
+        tryRmdirRecurse(sysrootDirWithPrefix ~ "bin");
+        tryRmdirRecurse(sysrootDirWithPrefix ~ "libexec");
+        tryRmdirRecurse(sysrootDirWithPrefix ~ "sbin");
+        tryRmdirRecurse(sysrootDirWithPrefix ~ "etc");
+        tryRmdirRecurse(sysrootDirWithPrefix ~ "var");
+        tryRmdirRecurse(sysrootDirWithPrefix ~ "share");
+    }
+    endBulletPoint();
+}
+
 void stripTargetLibraries()
 {
     if (skipStripLibraries)
@@ -45,17 +76,25 @@ void stripTargetLibraries()
     writeBulletPoint("Stripping target libraries...");
 
     auto oldPath = updatePathVar(binDir);
-    foreach (multilib; build.multilibs)
+
+    if (build.cleanup.matchesBuildType && !build.cleanup.stripTarget.empty)
     {
-        auto path = toolchainDir ~ Path(build.relativeSysrootPrefix) ~ Path("lib") ~ Path(
-            multilib.osFolder);
-        auto path2 = toolchainDir ~ Path(build.target) ~ Path(build.relativeSysrootPrefix) ~ Path(
-            "lib") ~ Path(multilib.osFolder);
-        auto path3 = sysrootDir ~ Path(build.relativeSysrootPrefix) ~ Path("lib") ~ Path(
-            multilib.osFolder);
-        stripPath(path, build.target ~ "-strip");
-        stripPath(path2, build.target ~ "-strip");
-        stripPath(path3, build.target ~ "-strip");
+        foreach (entry; build.cleanup.stripTarget)
+        {
+            stripPath(toolchainDir ~ entry, build.target ~ "-strip");
+        }
+    }
+    else
+    {
+        foreach (multilib; build.multilibs)
+        {
+            auto path = sysrootDirWithPrefix ~ Path("lib") ~ Path(multilib.osFolder);
+            auto path2 = toolchainDir ~ Path(build.target) ~ Path("lib") ~ Path(multilib.osFolder);
+            auto path3 = sysrootDirWithPrefix ~ Path("lib") ~ Path(multilib.osFolder);
+            stripPath(path, build.target ~ "-strip");
+            stripPath(path2, build.target ~ "-strip");
+            stripPath(path3, build.target ~ "-strip");
+        }
     }
     restorePathVar(oldPath);
     endBulletPoint();
@@ -70,11 +109,20 @@ void stripHostBinaries()
     }
     writeBulletPoint("Stripping host binaries...");
 
-    auto path = toolchainDir ~ "bin";
-    auto path2 = toolchainDir ~ Path(build.target) ~ "bin";
-
-    stripPath(path, hostStrip, true, false);
-    stripPath(path2, hostStrip, true, false);
+    if (build.cleanup.matchesBuildType && !build.cleanup.stripHost.empty)
+    {
+        foreach (entry; build.cleanup.stripHost)
+        {
+            stripPath(toolchainDir ~ entry, hostStrip, true, false);
+        }
+    }
+    else
+    {
+        auto path = toolchainDir ~ "bin";
+        auto path2 = toolchainDir ~ Path(build.target) ~ "bin";
+        stripPath(path, hostStrip, true, false);
+        stripPath(path2, hostStrip, true, false);
+    }
     endBulletPoint();
 }
 

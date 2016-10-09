@@ -43,15 +43,6 @@ void buildGlibc()
         }
     }
 
-    writeBulletPoint("Cleaning up sysroot");
-    tryRmdirRecurse(sysrootDir ~ "bin");
-    tryRmdirRecurse(sysrootDir ~ "libexec");
-    tryRmdirRecurse(sysrootDir ~ "sbin");
-    tryRmdirRecurse(sysrootDir ~ "etc");
-    tryRmdirRecurse(sysrootDir ~ "var");
-    tryRmdirRecurse(sysrootDir ~ "share");
-    endBulletPoint();
-
     restorePathVar(oldPath);
 
     if (!keepBuildFiles)
