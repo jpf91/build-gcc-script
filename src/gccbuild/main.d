@@ -52,11 +52,11 @@ void buildToolchain()
             break;
         case ToolchainType.native:
             toolchainDirStage1.tryRmdirRecurse();
-            if (build.linux.isInConfig)
+            if (build.linux.hasBuildCommands)
                 installLinuxHeaders();
-            if (build.binutils.isInConfig)
+            if (build.binutils.hasBuildCommands)
                 buildBinutils();
-            if (build.glibc.isInConfig)
+            if (build.glibc.hasBuildCommands)
             {
                 buildStage1GCC();
                 detectMultilib();

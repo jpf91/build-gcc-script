@@ -472,6 +472,11 @@ public:
     return c !is null && c.mainBuildCommand !is null;
 }
 
+@property bool hasBuildCommands(Component c)
+{
+    return c.isInConfig && c.mainBuildCommand.matchesBuildType;
+}
+
 class GlibcComponent : Component
 {
 public:
