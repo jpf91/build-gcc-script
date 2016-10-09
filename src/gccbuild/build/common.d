@@ -21,9 +21,21 @@ void runBuildCommands(string[] commands, string[string] extraVars = string[strin
 
 string substituteVars(string text, string[string] vars)
 {
+    size_t numReplaced;
+    do
+    {
+        text = substituteVars(text, vars, numReplaced);
+    }
+    while (numReplaced != 0);
+    return text;
+}
+
+string substituteVars(string text, string[string] vars, out size_t numReplaced)
+{
     auto result = appender!string();
 
     auto remain = text;
+    numReplaced = 0;
     while (!remain.empty)
     {
         auto parts = remain.findSplit("${");
@@ -39,6 +51,7 @@ string substituteVars(string text, string[string] vars)
                 parts[0], " in ", text);
             result ~= *val;
             remain = parts[2];
+            numReplaced++;
         }
     }
 
