@@ -5,6 +5,9 @@ import scriptlike, gccbuild;
 void buildBinutils()
 {
     auto comp = build.binutils;
+    if (!comp.mainBuildCommand.matchesBuildType)
+        return;
+
     startSection("Building binutils");
     auto saveCWD = comp.prepareBuildDir();
 

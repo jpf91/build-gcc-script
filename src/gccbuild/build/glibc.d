@@ -6,6 +6,9 @@ void buildGlibc()
 {
     //DIR_MULTILIB, MULTILIB_ARGS
     auto comp = build.glibc;
+    if (!comp.mainBuildCommand.matchesBuildType)
+        return;
+
     startSection("Building glibc");
     auto oldPath = updatePathVar(binDirStage1);
 

@@ -5,6 +5,8 @@ import scriptlike, gccbuild;
 void buildStage1GCC()
 {
     auto comp = build.gcc;
+    if (!comp.stage1BuildCommand.matchesBuildType)
+        return;
     startSection("Building stage 1 gcc");
     auto saveCWD = comp.prepareBuildDir();
     auto oldPath = updatePathVar(binDirStage1);
@@ -59,6 +61,8 @@ void detectMultilib(string compiler)
 void buildFinalGCC()
 {
     auto comp = build.gcc;
+    if (!comp.mainBuildCommand.matchesBuildType)
+        return;
     startSection("Building final gcc");
     auto saveCWD = comp.prepareBuildDir();
     auto oldPath = updatePathVar(binDir);

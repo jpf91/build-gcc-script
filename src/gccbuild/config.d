@@ -451,6 +451,19 @@ enum BuildMode
 class BuildCommand
 {
     string[] commands;
+    string[] variants;
+    @property bool matchesBuildType()
+    {
+        if(variants.empty)
+            return true;
+
+        foreach(variant; variants)
+        {
+            if(variant == to!string(build.type))
+                return true;
+        }
+        return false;
+    }
 }
 
 class GlibcBuildCommand : BuildCommand

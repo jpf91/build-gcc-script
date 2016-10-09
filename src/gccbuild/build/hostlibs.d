@@ -28,6 +28,9 @@ void buildMPC()
 
 private void buildLibrary(Component comp, string name)
 {
+    if (!comp.mainBuildCommand.matchesBuildType)
+        return;
+
     writeBulletPoint(name ~ ": " ~ comp.baseDirName.toString());
     auto saveCWD = comp.prepareBuildDir();
 

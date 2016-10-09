@@ -5,6 +5,9 @@ import scriptlike, gccbuild;
 void installLinuxHeaders()
 {
     auto comp = build.linux;
+    if (!comp.mainBuildCommand.matchesBuildType)
+        return;
+
     startSection("Installing linux headers");
 
     comp.buildFolder.tryRmdirRecurse();
