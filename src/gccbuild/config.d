@@ -363,21 +363,6 @@ struct MainConfig
         localPatchDirsCrossNative = config.localPatchDirsCrossNative;
         localPatchDirsCanadian = config.localPatchDirsCanadian;
 
-        if (build.target == build.host)
-        {
-            if (build.host == buildTriplet)
-                build.type = ToolchainType.native;
-            else
-                build.type = ToolchainType.cross_native;
-        }
-        else
-        {
-            if (build.host == buildTriplet)
-                build.type = ToolchainType.cross;
-            else
-                build.type = ToolchainType.canadian;
-        }
-
         void trySet(Component comp, BuildCommand com)
         {
             if (comp)
@@ -411,6 +396,21 @@ struct MainConfig
         overwriteIfSet(gcc.file, cmdOverwrites.gccFile);
         overwriteIfSet(gcc.suburl, cmdOverwrites.gccSuburl);
         overwriteIfSet(gcc.md5, cmdOverwrites.gccMD5);
+
+        if (build.target == build.host)
+        {
+            if (build.host == buildTriplet)
+                build.type = ToolchainType.native;
+            else
+                build.type = ToolchainType.cross_native;
+        }
+        else
+        {
+            if (build.host == buildTriplet)
+                build.type = ToolchainType.cross;
+            else
+                build.type = ToolchainType.canadian;
+        }
 
         if (!overwrite.type.isNull)
             type = overwrite.type;
