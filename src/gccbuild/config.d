@@ -30,23 +30,7 @@ string gdcSourcePath;
         return build.host ~ "-strip";
 }
 
-@property Path[] patchDirectories()
-{
-    Path[] result;
-    result ~= mainPatchDir;
-    foreach (dir; build.localPatchDirs)
-    {
-        // Make sure relative Paths are relative to the build config specifying them
-        auto path = Path(dir);
-        if (!path.isAbsolute)
-            path = path.absolutePath(buildConfig.dirName);
-        result ~= path;
-    }
-    foreach (dir; patchDirsCMD)
-        result ~= Path(dir);
-
-    return result;
-}
+Path[] patchDirectories;
 
 struct CMDBuildOverwrites
 {
@@ -184,10 +168,31 @@ void setupBuildVariables()
     buildVariables["TARGET_GCC"] = build.target ~ "-gcc";
 
     // overwrite from build.json
-    foreach (key, val; build.constants)
+    static void addConstants(string[string] cst)
     {
-        buildVariables[key] = val;
+        foreach (key, val; cst)
+        {
+            buildVariables[key] = val;
+        }
     }
+
+    addConstants(build.constants);
+    final switch (build.type)
+    {
+    case ToolchainType.cross:
+        addConstants(build.constantsCross);
+        break;
+    case ToolchainType.native:
+        addConstants(build.constantsNative);
+        break;
+    case ToolchainType.cross_native:
+        addConstants(build.constantsCrossNative);
+        break;
+    case ToolchainType.canadian:
+        addConstants(build.constantsCanadian);
+        break;
+    }
+
     // overwrites from cmd
     foreach (key, val; cmdVariables)
     {
@@ -198,6 +203,43 @@ void setupBuildVariables()
     {
         yap(key, "=", val);
     }
+    endSectionLog();
+
+    // Setup patch directories
+    startSectionLog("Setting patch directories");
+
+    static void addConfPatchDirs(string[] dirs)
+    {
+        foreach (dir; dirs)
+        {
+            // Make sure relative Paths are relative to the build config specifying them
+            auto path = Path(dir);
+            if (!path.isAbsolute)
+                path = path.absolutePath(buildConfig.dirName);
+            patchDirectories ~= path;
+        }
+    }
+
+    patchDirectories ~= mainPatchDir;
+    addConfPatchDirs(build.localPatchDirs);
+    final switch (build.type)
+    {
+    case ToolchainType.cross:
+        addConfPatchDirs(build.localPatchDirsCross);
+        break;
+    case ToolchainType.native:
+        addConfPatchDirs(build.localPatchDirsNative);
+        break;
+    case ToolchainType.cross_native:
+        addConfPatchDirs(build.localPatchDirsCrossNative);
+        break;
+    case ToolchainType.canadian:
+        addConfPatchDirs(build.localPatchDirsCanadian);
+        break;
+    }
+    foreach (dir; patchDirsCMD)
+        patchDirectories ~= Path(dir);
+
     endSectionLog();
 }
 
@@ -235,9 +277,17 @@ struct BuildConfig
 {
     string host, target, arch;
     string[string] constants;
+    @SerializedName("constants_native") string[string] constantsNative;
+    @SerializedName("constants_cross") string[string] constantsCross;
+    @SerializedName("constants_cross_native") string[string] constantsCrossNative;
+    @SerializedName("constants_canadian") string[string] constantsCanadian;
 
     @SerializedName("sysroot_prefix") string sysrootPrefix = "/";
     @SerializedName("patch_dirs") string[] localPatchDirs;
+    @SerializedName("patch_dirs_native") string[] localPatchDirsNative;
+    @SerializedName("patch_dirs_cross") string[] localPatchDirsCross;
+    @SerializedName("patch_dirs_cross_native") string[] localPatchDirsCrossNative;
+    @SerializedName("patch_dirs_canadian") string[] localPatchDirsCanadian;
 
     string type = "";
 
@@ -252,6 +302,11 @@ struct MainConfig
     @SerializeIgnore string target;
     @SerializeIgnore string arch;
     @SerializeIgnore string[string] constants;
+    @SerializeIgnore string[string] constantsNative;
+    @SerializeIgnore string[string] constantsCross;
+    @SerializeIgnore string[string] constantsCrossNative;
+    @SerializeIgnore string[string] constantsCanadian;
+
     @SerializeIgnore MultilibEntry[] multilibs;
     @SerializeIgnore string sysrootPrefix;
     @property string relativeSysrootPrefix()
@@ -261,6 +316,10 @@ struct MainConfig
 
     @SerializeIgnore ToolchainType type;
     @SerializeIgnore string[] localPatchDirs;
+    @SerializeIgnore string[] localPatchDirsNative;
+    @SerializeIgnore string[] localPatchDirsCross;
+    @SerializeIgnore string[] localPatchDirsCrossNative;
+    @SerializeIgnore string[] localPatchDirsCanadian;
 
     Component mpc, mpfr, gmp, binutils, linux, w32api;
     GCCComponent gcc;
@@ -293,8 +352,16 @@ struct MainConfig
         target = config.target;
         arch = config.arch;
         constants = config.constants;
+        constantsNative = config.constantsNative;
+        constantsCross = config.constantsCross;
+        constantsCrossNative = build.constantsCrossNative;
+        constantsCanadian = build.constantsCanadian;
         sysrootPrefix = config.sysrootPrefix;
         localPatchDirs = config.localPatchDirs;
+        localPatchDirsNative = config.localPatchDirsNative;
+        localPatchDirsCross = config.localPatchDirsCross;
+        localPatchDirsCrossNative = config.localPatchDirsCrossNative;
+        localPatchDirsCanadian = config.localPatchDirsCanadian;
 
         if (build.target == build.host)
         {
@@ -454,12 +521,12 @@ class BuildCommand
     string[] variants;
     @property bool matchesBuildType()
     {
-        if(variants.empty)
+        if (variants.empty)
             return true;
 
-        foreach(variant; variants)
+        foreach (variant; variants)
         {
-            if(variant == to!string(build.type))
+            if (variant == to!string(build.type))
                 return true;
         }
         return false;
