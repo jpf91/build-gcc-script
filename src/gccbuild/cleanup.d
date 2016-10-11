@@ -47,11 +47,22 @@ struct GCCInfo
 void removeFolders()
 {
     writeBulletPoint("Removing unnecessary folders");
-    if (build.cleanup.matchesBuildType && !build.cleanup.remove.empty)
+    if ((build.cleanup.matchesBuildType && !build.cleanup.remove.empty)
+            || (build.variantCleanup && !build.variantCleanup.remove.empty))
     {
-        foreach (entry; build.cleanup.remove)
+        if (build.cleanup.matchesBuildType)
         {
-            tryRmdirRecurse(toolchainDir ~ entry);
+            foreach (entry; build.cleanup.remove)
+            {
+                tryRmdirRecurse(toolchainDir ~ entry);
+            }
+        }
+        if (build.variantCleanup)
+        {
+            foreach (entry; build.variantCleanup.remove)
+            {
+                tryRmdirRecurse(toolchainDir ~ entry);
+            }
         }
     }
     else
@@ -86,11 +97,22 @@ void stripTargetLibraries()
 
     auto oldPath = updatePathVar(binDir);
 
-    if (build.cleanup.matchesBuildType && !build.cleanup.stripTarget.empty)
+    if ((build.cleanup.matchesBuildType && !build.cleanup.stripTarget.empty)
+            || (build.variantCleanup && !build.variantCleanup.stripTarget.empty))
     {
-        foreach (entry; build.cleanup.stripTarget)
+        if (build.cleanup.matchesBuildType)
         {
-            stripPath(toolchainDir ~ entry, build.target ~ "-strip");
+            foreach (entry; build.cleanup.stripTarget)
+            {
+                stripPath(toolchainDir ~ entry, build.target ~ "-strip");
+            }
+        }
+        if (build.variantCleanup)
+        {
+            foreach (entry; build.variantCleanup.stripTarget)
+            {
+                stripPath(toolchainDir ~ entry, build.target ~ "-strip");
+            }
         }
     }
     else
@@ -120,11 +142,22 @@ void stripHostBinaries()
     }
     writeBulletPoint("Stripping host binaries...");
 
-    if (build.cleanup.matchesBuildType && !build.cleanup.stripHost.empty)
+    if ((build.cleanup.matchesBuildType && !build.cleanup.stripHost.empty)
+            || (build.variantCleanup && !build.variantCleanup.stripHost.empty))
     {
-        foreach (entry; build.cleanup.stripHost)
+        if (build.cleanup.matchesBuildType)
         {
-            stripPath(toolchainDir ~ entry, hostStrip, true, false);
+            foreach (entry; build.cleanup.stripHost)
+            {
+                stripPath(toolchainDir ~ entry, hostStrip, true, false);
+            }
+        }
+        if (build.variantCleanup)
+        {
+            foreach (entry; build.variantCleanup.stripHost)
+            {
+                stripPath(toolchainDir ~ entry, hostStrip, true, false);
+            }
         }
     }
     else

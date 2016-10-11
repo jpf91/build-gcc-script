@@ -299,6 +299,10 @@ struct BuildConfig
     BuildCommand gmp, mpfr, mpc, linux, binutils, w32api, gcc;
     GlibcBuildCommand glibc;
     CleanupCommand cleanup;
+    @SerializedName("cleanup_cross") CleanupCommand cleanupCross;
+    @SerializedName("cleanup_cross_native") CleanupCommand cleanupCrossNative;
+    @SerializedName("cleanup_native") CleanupCommand cleanupNative;
+    @SerializedName("cleanup_canadian") CleanupCommand cleanupCanadian;
     @SerializedName("gcc_stage1") BuildCommand gccStage1;
 }
 
@@ -334,6 +338,24 @@ struct MainConfig
     @SerializedName("glibc_ports") Component glibcPorts;
 
     @SerializeIgnore CleanupCommand cleanup;
+    @SerializeIgnore CleanupCommand cleanupCross;
+    @SerializeIgnore CleanupCommand cleanupCrossNative;
+    @SerializeIgnore CleanupCommand cleanupNative;
+    @SerializeIgnore CleanupCommand cleanupCanadian;
+    @property CleanupCommand variantCleanup()
+    {
+        final switch (type)
+        {
+        case ToolchainType.native:
+            return cleanupNative;
+        case ToolchainType.canadian:
+            return cleanupCanadian;
+        case ToolchainType.cross:
+            return cleanupCross;
+        case ToolchainType.cross_native:
+            return cleanupCrossNative;
+        }
+    }
 
     @property HostType targetType()
     {
@@ -371,6 +393,10 @@ struct MainConfig
         localPatchDirsCrossNative = config.localPatchDirsCrossNative;
         localPatchDirsCanadian = config.localPatchDirsCanadian;
         cleanup = config.cleanup;
+        cleanupNative = config.cleanupNative;
+        cleanupCanadian = config.cleanupCanadian;
+        cleanupCross = config.cleanupCross;
+        cleanupCrossNative = config.cleanupCrossNative;
 
         void trySet(Component comp, BuildCommand com)
         {
