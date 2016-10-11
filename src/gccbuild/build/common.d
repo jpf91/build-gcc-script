@@ -19,7 +19,7 @@ void runBuildCommands(string[] commands, string[string] extraVars = string[strin
     }
 }
 
-string substituteVars(string text, string[string] vars)
+string substituteVars(string text, string[string] vars = string[string].init)
 {
     size_t numReplaced;
     do

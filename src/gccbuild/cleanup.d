@@ -54,14 +54,14 @@ void removeFolders()
         {
             foreach (entry; build.cleanup.remove)
             {
-                tryRmdirRecurse(toolchainDir ~ entry);
+                tryRmdirRecurse(toolchainDir ~ entry.substituteVars);
             }
         }
         if (build.variantCleanup)
         {
             foreach (entry; build.variantCleanup.remove)
             {
-                tryRmdirRecurse(toolchainDir ~ entry);
+                tryRmdirRecurse(toolchainDir ~ entry.substituteVars);
             }
         }
     }
@@ -104,14 +104,14 @@ void stripTargetLibraries()
         {
             foreach (entry; build.cleanup.stripTarget)
             {
-                stripPath(toolchainDir ~ entry, build.target ~ "-strip");
+                stripPath(toolchainDir ~ entry.substituteVars, build.target ~ "-strip");
             }
         }
         if (build.variantCleanup)
         {
             foreach (entry; build.variantCleanup.stripTarget)
             {
-                stripPath(toolchainDir ~ entry, build.target ~ "-strip");
+                stripPath(toolchainDir ~ entry.substituteVars, build.target ~ "-strip");
             }
         }
     }
@@ -149,14 +149,14 @@ void stripHostBinaries()
         {
             foreach (entry; build.cleanup.stripHost)
             {
-                stripPath(toolchainDir ~ entry, hostStrip, true, false);
+                stripPath(toolchainDir ~ entry.substituteVars, hostStrip, true, false);
             }
         }
         if (build.variantCleanup)
         {
             foreach (entry; build.variantCleanup.stripHost)
             {
-                stripPath(toolchainDir ~ entry, hostStrip, true, false);
+                stripPath(toolchainDir ~ entry.substituteVars, hostStrip, true, false);
             }
         }
     }
