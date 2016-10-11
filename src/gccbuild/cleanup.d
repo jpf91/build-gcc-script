@@ -62,6 +62,15 @@ void removeFolders()
         tryRmdirRecurse(sysrootDirWithPrefix ~ "etc");
         tryRmdirRecurse(sysrootDirWithPrefix ~ "var");
         tryRmdirRecurse(sysrootDirWithPrefix ~ "share");
+        tryRmdirRecurse(sysrootDir ~ "bin");
+        tryRmdirRecurse(sysrootDir ~ "libexec");
+        tryRmdirRecurse(sysrootDir ~ "sbin");
+        tryRmdirRecurse(sysrootDir ~ "etc");
+        tryRmdirRecurse(sysrootDir ~ "var");
+        tryRmdirRecurse(sysrootDir ~ "share");
+        tryRmdirRecurse(toolchainDir ~ "etc");
+        tryRmdirRecurse(toolchainDir ~ "var");
+        tryRmdirRecurse(toolchainDir ~ "share");
     }
     endBulletPoint();
 }
@@ -90,10 +99,12 @@ void stripTargetLibraries()
         {
             auto path = sysrootDirWithPrefix ~ Path("lib") ~ Path(multilib.osFolder);
             auto path2 = toolchainDir ~ Path(build.target) ~ Path("lib") ~ Path(multilib.osFolder);
-            auto path3 = sysrootDirWithPrefix ~ Path("lib") ~ Path(multilib.osFolder);
+            auto path3 = toolchainDir ~ Path("lib") ~ Path(multilib.osFolder);
+            auto path4 = toolchainDir ~ Path("lib");
             stripPath(path, build.target ~ "-strip");
             stripPath(path2, build.target ~ "-strip");
             stripPath(path3, build.target ~ "-strip");
+            stripPath(path4, build.target ~ "-strip");
         }
     }
     restorePathVar(oldPath);

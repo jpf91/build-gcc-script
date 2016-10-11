@@ -362,8 +362,8 @@ struct MainConfig
         constants = config.constants;
         constantsNative = config.constantsNative;
         constantsCross = config.constantsCross;
-        constantsCrossNative = build.constantsCrossNative;
-        constantsCanadian = build.constantsCanadian;
+        constantsCrossNative = config.constantsCrossNative;
+        constantsCanadian = config.constantsCanadian;
         sysrootPrefix = config.sysrootPrefix;
         localPatchDirs = config.localPatchDirs;
         localPatchDirsNative = config.localPatchDirsNative;
