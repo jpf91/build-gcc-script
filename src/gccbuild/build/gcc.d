@@ -65,11 +65,16 @@ void buildFinalGCC()
         return;
     startSection("Building final gcc");
     auto saveCWD = comp.prepareBuildDir();
-    auto oldPath = updatePathVar(binDir);
+
+    // Native builds need the newly build binutils in PATH
+    string oldPath;
+    if(build.type == ToolchainType.native || build.type == ToolchainType.cross)
+        oldPath = updatePathVar(binDir);
 
     runBuildCommands(comp.mainBuildCommand.commands, ["CONFIGURE" : comp.configureFile.toString()]);
 
-    restorePathVar(oldPath);
+    if(build.type == ToolchainType.native || build.type == ToolchainType.cross)
+        restorePathVar(oldPath);
 
     if (!keepBuildFiles)
         rmdirRecurse(comp.buildFolder);
