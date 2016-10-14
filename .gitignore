@@ -4,4 +4,5 @@ __dummy.html
 *.o
 *.obj
 gcc-build-script
-cache/
+configs/cache/
+bin/
