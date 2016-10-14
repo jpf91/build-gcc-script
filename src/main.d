@@ -52,9 +52,10 @@ bool handleArguments(string[] args)
         "gcc-suburl", "Overwrite gcc suburl", &cmdOverwrites.gccSuburl,
         "gcc-md5", "Overwrite gcc file md5", &cmdOverwrites.gccMD5,
         "host-strip", "Command to strip binaries for host", &hostStripCMD,
-        "extra-patch-dir", "Add directory containing patches", &patchDirsCMD,
-        "gdc-src", "Path to GDC sources", &gdcSourcePath, "type",
-        "Overwrite toolchain type", (string opt, string val) {
+        "target-gcc", "Target GCC used to detect multilib in some cases",
+        &targetGCCCMD, "extra-patch-dir", "Add directory containing patches",
+        &patchDirsCMD, "gdc-src", "Path to GDC sources", &gdcSourcePath,
+        "type", "Overwrite toolchain type", (string opt, string val) {
         cmdOverwrites.type = to!ToolchainType(val);
     },);
 

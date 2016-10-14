@@ -25,9 +25,9 @@ void detectMultilib()
     restorePathVar(oldPath);
 }
 
-void detectMultilib(string compiler)
+void detectMultilib(string compiler, string msg = "Detecting available multilibs")
 {
-    startSection("Detecting available multilibs");
+    startSection(msg);
 
     auto output = runCollectLog(compiler ~ " --print-multi-lib");
     foreach (line; output.lineSplitter)
@@ -68,12 +68,12 @@ void buildFinalGCC()
 
     // Native builds need the newly build binutils in PATH
     string oldPath;
-    if(build.type == ToolchainType.native || build.type == ToolchainType.cross)
+    if (build.type == ToolchainType.native || build.type == ToolchainType.cross)
         oldPath = updatePathVar(binDir);
 
     runBuildCommands(comp.mainBuildCommand.commands, ["CONFIGURE" : comp.configureFile.toString()]);
 
-    if(build.type == ToolchainType.native || build.type == ToolchainType.cross)
+    if (build.type == ToolchainType.native || build.type == ToolchainType.cross)
         restorePathVar(oldPath);
 
     if (!keepBuildFiles)

@@ -45,7 +45,8 @@ void buildToolchain()
                          * We have to ask the $BUILD => $TARGET compiler for supported multilibs,
                          * and this must match with the final GCCs multilib configuration / paths!
                          */
-                detectMultilib(build.target ~ "-gcc");
+                detectMultilib(targetGCC,
+                    "Detecting available multilibs from BUILD=>TARGET compiler");
             }
             buildGlibc();
             buildFinalGCC();
@@ -85,7 +86,8 @@ void buildToolchain()
                      * For debugging only, but this must match the final compiler multilib configuration,
                      * otherwise the built toolchain will not work correctly.
                      */
-            detectMultilib(build.target ~ "-gcc");
+            detectMultilib(targetGCC,
+                "Info: multilibs support in BUILD=>TARGET compiler");
             buildFinalGCC();
             break;
         }

@@ -19,6 +19,15 @@ bool keepBuildFiles = false;
 string hostStripCMD;
 string[] patchDirsCMD;
 string gdcSourcePath;
+string targetGCCCMD;
+
+@property string targetGCC()
+{
+    if (targetGCCCMD.empty)
+        return build.target ~ "-gcc";
+    else
+        return targetGCCCMD;
+}
 
 @property string hostStrip()
 {
