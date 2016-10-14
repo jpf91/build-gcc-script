@@ -1,0 +1,11 @@
+{
+	"name": "multi-wrapper",
+	"authors": [
+		"Johannes Pfau"
+	],
+	"description": "A small wrapper for GCC suppressing multilib detection",
+	"copyright": "Copyright © 2016, Johannes Pfau",
+	"license": "BSL-1.0",
+	"sourceFiles": ["multi-wrapper.d"],
+	"targetType": "executable"
+}

@@ -10,5 +10,8 @@
 	},
 	"description": "A script to build GCC compilers",
 	"copyright": "Copyright © 2016, Johannes Pfau",
-	"license": "BSL-1.0"
+	"license": "BSL-1.0",
+	"subPackages": [
+		"./multi-wrapper"
+	]
 }
