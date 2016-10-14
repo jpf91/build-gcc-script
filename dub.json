@@ -13,5 +13,8 @@
 	"license": "BSL-1.0",
 	"subPackages": [
 		"./multi-wrapper"
-	]
+	],
+	"targetType": "executable",
+	"targetName": "gcc-build-script",
+	"targetPath": "./bin"
 }
