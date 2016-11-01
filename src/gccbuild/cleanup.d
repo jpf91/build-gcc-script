@@ -164,8 +164,12 @@ void stripHostBinaries()
     {
         auto path = toolchainDir ~ "bin";
         auto path2 = toolchainDir ~ Path(build.target) ~ "bin";
+        auto path3 = toolchainDir ~ "libexec";
+        auto path4 = toolchainDir ~ Path(build.target) ~ "libexec";
         stripPath(path, hostStrip, true, false);
         stripPath(path2, hostStrip, true, false);
+        stripPath(path3, hostStrip, true, true);
+        stripPath(path4, hostStrip, true, true);
     }
     endBulletPoint();
 }
