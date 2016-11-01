@@ -104,14 +104,14 @@ void stripTargetLibraries()
         {
             foreach (entry; build.cleanup.stripTarget)
             {
-                stripPath(toolchainDir ~ entry.substituteVars, build.target ~ "-strip");
+                stripPath(toolchainDir ~ entry.substituteVars, targetStrip);
             }
         }
         if (build.variantCleanup)
         {
             foreach (entry; build.variantCleanup.stripTarget)
             {
-                stripPath(toolchainDir ~ entry.substituteVars, build.target ~ "-strip");
+                stripPath(toolchainDir ~ entry.substituteVars, targetStrip);
             }
         }
     }
@@ -123,10 +123,10 @@ void stripTargetLibraries()
             auto path2 = toolchainDir ~ Path(build.target) ~ Path("lib") ~ Path(multilib.osFolder);
             auto path3 = toolchainDir ~ Path("lib") ~ Path(multilib.osFolder);
             auto path4 = toolchainDir ~ Path("lib");
-            stripPath(path, build.target ~ "-strip");
-            stripPath(path2, build.target ~ "-strip");
-            stripPath(path3, build.target ~ "-strip");
-            stripPath(path4, build.target ~ "-strip");
+            stripPath(path, targetStrip);
+            stripPath(path2, targetStrip);
+            stripPath(path3, targetStrip);
+            stripPath(path4, targetStrip);
         }
     }
     restorePathVar(oldPath);

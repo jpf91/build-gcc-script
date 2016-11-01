@@ -17,6 +17,7 @@ bool skipStripLibraries = false;
 bool skipStripBinaries = false;
 bool keepBuildFiles = false;
 string hostStripCMD;
+string targetStripCMD;
 string[] patchDirsCMD;
 string gdcSourcePath;
 string targetGCCCMD;
@@ -37,6 +38,16 @@ string targetGCCCMD;
         return "strip";
     else
         return build.host ~ "-strip";
+}
+
+@property string targetStrip()
+{
+    if (!targetStripCMD.empty)
+        return hostStripCMD;
+    else if (build.type == ToolchainType.native)
+        return "strip";
+    else
+        return build.target ~ "-strip";
 }
 
 Path[] patchDirectories;
