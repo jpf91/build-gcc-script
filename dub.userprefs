@@ -1,12 +1,8 @@
 ﻿<Properties StartupItem="dub.json">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Default" PreferredExecutionTarget="cov" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="src/gccbuild/config.d">
+  <MonoDevelop.Ide.Workbench ActiveDocument="build-gdc-toolchains/build-gdc-toolchains.d">
     <Files>
-      <File FileName="src/main.d" Line="51" Column="68" />
-      <File FileName="src/gccbuild/log.d" Line="1" Column="1" />
-      <File FileName="src/gccbuild/console.d" Line="56" Column="15" />
-      <File FileName="src/gccbuild/cleanup.d" Line="25" Column="59" />
-      <File FileName="src/gccbuild/config.d" Line="7" Column="43" />
+      <File FileName="build-gdc-toolchains/build-gdc-toolchains.d" Line="30" Column="8" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

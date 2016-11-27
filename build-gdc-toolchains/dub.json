@@ -1,0 +1,16 @@
+{
+	"name": "build-gdc-toolchains",
+	"authors": [
+		"Johannes Pfau"
+	],
+	"dependencies": {
+		"scriptlike": "~>0.9.6"
+	},
+	"description": "Build GDC compilers for gdcproject.org",
+	"copyright": "Copyright © 2016, Johannes Pfau",
+	"license": "BSL-1.0",
+	"sourceFiles": ["build-gdc-toolchains.d"],
+	"targetType": "executable",
+	"targetName": "build-gdc-toolchains",
+	"targetPath": "../bin"
+}

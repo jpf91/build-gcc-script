@@ -1,0 +1,16 @@
+{
+	"name": "intall-gdmd",
+	"authors": [
+		"Johannes Pfau"
+	],
+	"dependencies": {
+		"scriptlike": "~>0.9.6"
+	},
+	"description": "Install GDMD into a GCC toolchain folder",
+	"copyright": "Copyright © 2016, Johannes Pfau",
+	"license": "BSL-1.0",
+	"sourceFiles": ["install-gdmd.d"],
+	"targetType": "executable",
+	"targetName": "install-gdmd",
+	"targetPath": "../bin"
+}

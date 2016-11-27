@@ -12,7 +12,10 @@
 	"copyright": "Copyright © 2016, Johannes Pfau",
 	"license": "BSL-1.0",
 	"subPackages": [
-		"./multi-wrapper"
+		"./multi-wrapper",
+		"./install-gdmd",
+		"./build-gdmd",
+		"./build-gdc-toolchains"
 	],
 	"targetType": "executable",
 	"targetName": "gcc-build-script",

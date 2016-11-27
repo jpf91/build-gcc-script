@@ -1,0 +1,16 @@
+{
+	"name": "build-gdmd",
+	"authors": [
+		"Johannes Pfau"
+	],
+	"dependencies": {
+		"scriptlike": "~>0.9.6"
+	},
+	"description": "Build GDMD for various hosts",
+	"copyright": "Copyright © 2016, Johannes Pfau",
+	"license": "BSL-1.0",
+	"sourceFiles": ["build-gdmd.d"],
+	"targetType": "executable",
+	"targetName": "build-gdmd",
+	"targetPath": "../bin"
+}
