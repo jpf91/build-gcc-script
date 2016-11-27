@@ -275,7 +275,7 @@ struct ToolchainConfig
         tryRemove(resultFile);
         run(mixin(interp!"install-gdmd ${targetDir} ${gccVersion} ${host} ${gdmd}"));
         if (isMinGWHost)
-            run(mixin(interp!"7zr a '${resultFile}' ${target}"));
+            run(mixin(interp!"7zr a -l '${resultFile}' ${target}"));
         else
             run(mixin(interp!"tar -cf - '${target}' | xz -9 -c - > '${resultFile}'"));
         
