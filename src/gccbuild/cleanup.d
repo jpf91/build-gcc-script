@@ -184,7 +184,8 @@ void stripPath(Path path, string stripProgram, bool stripExes = false, bool stri
     {
         if (!entry.isFile)
             continue;
-        if (stripLibs && (entry.extension == ".so" || entry.extension == ".dll"))
+        if (stripLibs && (entry.extension == ".so" || entry.extension == ".dll"
+            || entry.extension == ".a" || entry.extension == ".lib"))
         {
             // Skip linker script files (libc.so)
             if (!runCollectLog("file -b " ~ entry).canFind("ASCII"))
