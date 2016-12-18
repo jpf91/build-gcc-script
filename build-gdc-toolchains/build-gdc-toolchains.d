@@ -6,7 +6,8 @@ import scriptlike;
 string basePathEnv;
 string gccVersion;
 Path installDir;
-Path sourceConfig;
+Path defaultSourceConfig;
+Path defaultSourceConfigOldB;
 Path resultBase;
 Path gdcRepo;
 string fullGCCVersion;
@@ -32,6 +33,7 @@ void build()
     {
         ToolchainConfig toolchain;
         toolchain.buildConfig = "configs/x86_64/linux-ml.json";
+        toolchain.sourceConfig = defaultSourceConfigOldB;
         toolchain.host = "x86_64-unknown-linux-gnu";
         toolchain.target = "x86_64-unknown-linux-gnu";
         toolchain.installNativeGDMD = false;
@@ -46,6 +48,7 @@ void build()
     {
         ToolchainConfig toolchain;
         toolchain.buildConfig = "configs/arm-ml/linux-ml.json";
+        toolchain.sourceConfig = defaultSourceConfig;
         toolchain.host = "x86_64-unknown-linux-gnu";
         toolchain.target = "arm-unknown-linux-gnueabihf";
         toolchain.installNativeGDMD = false;
@@ -59,6 +62,7 @@ void build()
     {
         ToolchainConfig toolchain;
         toolchain.buildConfig = "configs/x86_64/linux-ml.json";
+        toolchain.sourceConfig = defaultSourceConfig;
         toolchain.host = "x86_64-unknown-linux-gnu";
         toolchain.target = "x86_64-unknown-linux-gnu";
         toolchain.installNativeGDMD = true;
@@ -77,6 +81,7 @@ void build()
     {
         ToolchainConfig toolchain;
         toolchain.buildConfig = "configs/i686/linux.json";
+        toolchain.sourceConfig = defaultSourceConfig;
         toolchain.host = "i686-unknown-linux-gnu";
         toolchain.target = "i686-unknown-linux-gnu";
         toolchain.installNativeGDMD = true;
@@ -94,6 +99,7 @@ void build()
     {
         ToolchainConfig toolchain;
         toolchain.buildConfig = "configs/x86_64/linux-ml.json";
+        toolchain.sourceConfig = defaultSourceConfig;
         toolchain.host = "x86_64-w64-mingw32";
         toolchain.target = "x86_64-unknown-linux-gnu";
         toolchain.installNativeGDMD = false;
@@ -107,6 +113,7 @@ void build()
     {
         ToolchainConfig toolchain;
         toolchain.buildConfig = "configs/arm-ml/linux-ml.json";
+        toolchain.sourceConfig = defaultSourceConfig;
         toolchain.host = "x86_64-w64-mingw32";
         toolchain.target = "arm-unknown-linux-gnueabihf";
         toolchain.installNativeGDMD = false;
@@ -124,6 +131,7 @@ void build()
     {
         ToolchainConfig toolchain;
         toolchain.buildConfig = "configs/x86_64/linux-ml.json";
+        toolchain.sourceConfig = defaultSourceConfig;
         toolchain.host = "i686-w64-mingw32";
         toolchain.target = "x86_64-unknown-linux-gnu";
         toolchain.installNativeGDMD = false;
@@ -137,6 +145,7 @@ void build()
     {
         ToolchainConfig toolchain;
         toolchain.buildConfig = "configs/arm-ml/linux-ml.json";
+        toolchain.sourceConfig = defaultSourceConfig;
         toolchain.host = "i686-w64-mingw32";
         toolchain.target = "arm-unknown-linux-gnueabihf";
         toolchain.installNativeGDMD = false;
@@ -154,6 +163,7 @@ void build()
     {
         ToolchainConfig toolchain;
         toolchain.buildConfig = "configs/arm/linux.json";
+        toolchain.sourceConfig = defaultSourceConfig;
         toolchain.host = "arm-unknown-linux-gnueabi";
         toolchain.target = "arm-unknown-linux-gnueabi";
         toolchain.installNativeGDMD = true;
@@ -167,6 +177,7 @@ void build()
     {
         ToolchainConfig toolchain;
         toolchain.buildConfig = "configs/armhf/linux.json";
+        toolchain.sourceConfig = defaultSourceConfig;
         toolchain.host = "arm-unknown-linux-gnueabihf";
         toolchain.target = "arm-unknown-linux-gnueabihf";
         toolchain.installNativeGDMD = true;
@@ -183,7 +194,8 @@ void setupVariables(string[] args)
     gccVersion = args[1];
     basePathEnv = environment["PATH"];
     installDir = Path("/home/build/share/cache/install/");
-    sourceConfig = Path("/home/build/share/configs/sources-${gccVersion}.json");
+    defaultSourceConfig = Path(mixin(interp!"/home/build/share/configs/sources-${gccVersion}.json"));
+    defaultSourceConfigOldB = Path(mixin(interp!"/home/build/share/configs/sources-${gccVersion}-oldbinutils.json"));
     resultBase = Path("/home/build/share/result") ~ gccVersion;
     fullGCCVersion = args[2]; // TODO: read from source config
     gitName = args[3];
@@ -192,13 +204,15 @@ void setupVariables(string[] args)
     string date = strip(runCollect("date +%Y%m%d"));
     pkgVersion = mixin(interp!"--variable=PKGVERSION:\"gdcproject.org ${date}-${gitName}\"");
     baseArgs = mixin(interp!"--force-extract --num-cpus=4 --gdc-src=${gdcRepo} --mirrors=configs/mirrors.json '${pkgVersion}'");
-    sourceConfig = Path(mixin(interp!"configs/sources-${gccVersion}.json"));
 }
 
 struct ToolchainConfig
 {
     // Main configuration file to build compiler
     string buildConfig;
+    
+    // Configuration file for sources
+    Path sourceConfig;
     
     // Host triplet to build for
     string host;
