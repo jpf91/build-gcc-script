@@ -190,13 +190,13 @@ void stripPath(Path path, string stripProgram, bool stripExes = false, bool stri
             // Skip linker script files (libc.so)
             if (!runCollectLog("file -b " ~ entry).canFind("ASCII"))
             {
-                tryRunCollectLog(stripProgram ~ " " ~ entry);
+                tryRunCollectLog(stripProgram ~ " --strip-debug " ~ entry);
             }
         }
         else if (stripExes && (entry.extension == ".exe"
                 || runCollectLog("file -b " ~ entry).canFind("executable")))
         {
-            tryRunCollectLog(stripProgram ~ " " ~ entry);
+            tryRunCollectLog(stripProgram ~ " --strip-debug " ~ entry);
         }
     }
 }
